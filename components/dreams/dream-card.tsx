@@ -27,16 +27,19 @@ export function DreamCard({ dream, viewerId }: { dream: Dream; viewerId?: string
         </Avatar>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-bold text-foreground">{dream.author?.name ?? t.common.dreamer}</p>
-          <p className="truncate text-xs text-muted-foreground">
+          <div className="flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
             {authorDetails ? (
               <>
-                <MapPin className="mr-1 inline h-3 w-3 align-[-2px]" />
-                {authorDetails} · {timeAgo(dream.created_at, locale)}
+                <span className="flex min-w-0 items-center">
+                  <MapPin className="mr-1 h-3 w-3 shrink-0" />
+                  <span className="truncate">{authorDetails}</span>
+                </span>
+                <span className="shrink-0">· {timeAgo(dream.created_at, locale)}</span>
               </>
             ) : (
-              timeAgo(dream.created_at, locale)
+              <span>{timeAgo(dream.created_at, locale)}</span>
             )}
-          </p>
+          </div>
         </div>
         <Badge className="rounded-full bg-muted text-muted-foreground">
           {t.categories[dream.category as keyof typeof t.categories] ?? dream.category}

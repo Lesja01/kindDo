@@ -13,7 +13,7 @@ import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { DreamVisibility } from "@/types/database";
 
-const categories = ["Family", "Health", "Learning", "Home", "Work", "Adventure", "Other"];
+const categories = ["Family", "Health", "Learning", "Home", "Work", "Travel", "Creativity", "Sport", "Kids", "Community"];
 
 export function CreateDreamForm() {
   const router = useRouter();
@@ -87,6 +87,7 @@ export function CreateDreamForm() {
             id="description"
             className="min-h-24 rounded-2xl border-0 bg-background ring-1 ring-border/70"
             value={description}
+            placeholder={t.dreams.descriptionPlaceholder}
             onChange={(event) => setDescription(event.target.value)}
             required
             maxLength={300}
@@ -116,7 +117,9 @@ export function CreateDreamForm() {
         <div className="mt-3">
           <div className="mb-2 flex items-center justify-between gap-3">
             <Label>{t.dreams.visibility}</Label>
-            <span className="text-xs font-medium text-muted-foreground">{visibility === "public" ? t.dreams.publicVisibility : t.dreams.privateVisibility}</span>
+            <span className="text-right text-xs font-medium text-muted-foreground">
+              {visibility === "public" ? t.dreams.publicVisibilityHint : t.dreams.privateVisibilityHint}
+            </span>
           </div>
           <div className="grid grid-cols-2 gap-1 rounded-2xl bg-background p-1">
             <VisibilityOption

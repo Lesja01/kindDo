@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { AvatarUpload } from "@/components/media/avatar-upload";
 import { useI18n } from "@/lib/i18n";
 import { createClient } from "@/lib/supabase/client";
 import { Profile, SocialLink } from "@/types/database";
@@ -18,7 +17,6 @@ export function ProfileForm({ profile, links }: { profile: Profile; links: Socia
   const [bio, setBio] = useState(profile.bio ?? "");
   const [age, setAge] = useState(profile.age?.toString() ?? "");
   const [location, setLocation] = useState(profile.location ?? "");
-  const [avatar, setAvatar] = useState(profile.avatar ?? "");
   const [instagram, setInstagram] = useState(links.find((link) => link.platform === "instagram")?.url ?? "");
   const [tiktok, setTiktok] = useState(links.find((link) => link.platform === "tiktok")?.url ?? "");
   const [telegram, setTelegram] = useState(links.find((link) => link.platform === "telegram")?.url ?? "");
@@ -32,7 +30,7 @@ export function ProfileForm({ profile, links }: { profile: Profile; links: Socia
     const parsedAge = age.trim() ? Number(age) : null;
     const { error } = await supabase
       .from("users")
-      .update({ name, bio, avatar, age: parsedAge, location: location.trim() || null })
+      .update({ name, bio, age: parsedAge, location: location.trim() || null })
       .eq("id", profile.id);
 
     const rows = [
@@ -83,11 +81,6 @@ export function ProfileForm({ profile, links }: { profile: Profile; links: Socia
             onChange={(event) => setLocation(event.target.value)}
           />
         </div>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="avatar">{t.profile.avatar}</Label>
-        <AvatarUpload value={avatar} name={name} onChange={setAvatar} />
-        <Input id="avatar" className="h-10 rounded-2xl border-0 bg-background ring-1 ring-border/70" value={avatar} onChange={(event) => setAvatar(event.target.value)} />
       </div>
       <div className="space-y-2">
         <Label htmlFor="bio">{t.profile.bio}</Label>

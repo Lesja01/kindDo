@@ -64,6 +64,9 @@ export type Message = {
   sender_id: string | null;
   text: string;
   kind: "user" | "system";
+  attachment_type: "image" | "contact" | "location" | null;
+  attachment_url: string | null;
+  attachment_payload: Record<string, unknown> | null;
   created_at: string;
   sender?: Profile | null;
 };
@@ -91,5 +94,12 @@ export type SocialLink = {
 export type Favorite = {
   user_id: string;
   dream_id: string;
+  created_at: string;
+};
+
+export type ProfilePhoto = {
+  id: string;
+  user_id: string;
+  url: string;
   created_at: string;
 };

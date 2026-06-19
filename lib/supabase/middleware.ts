@@ -36,8 +36,10 @@ export async function updateSession(request: NextRequest) {
     data: { user }
   } = await supabase.auth.getUser();
 
-  const protectedPrefixes = ["/create", "/chats", "/my-dreams", "/notifications", "/profile"];
-  const isProtected = protectedPrefixes.some((path) => request.nextUrl.pathname.startsWith(path));
+  const protectedPrefixes = ["/create", "/chats", "/my-dreams", "/notifications"];
+  const isProtected =
+    request.nextUrl.pathname === "/profile" ||
+    protectedPrefixes.some((path) => request.nextUrl.pathname.startsWith(path));
 
   if (!user && isProtected) {
     const loginUrl = request.nextUrl.clone();

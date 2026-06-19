@@ -39,16 +39,19 @@ export function AvatarUpload({ value, name, onChange }: { value: string; name: s
 
   return (
     <div className="flex items-center gap-4 rounded-3xl bg-background p-3">
-      <Avatar className="h-20 w-20 ring-4 ring-white">
-        <AvatarImage src={value || undefined} alt={name} />
-        <AvatarFallback>{initials(name)}</AvatarFallback>
-      </Avatar>
+      <label className="group relative cursor-pointer rounded-full">
+        <Avatar className="h-24 w-24 ring-4 ring-white">
+          <AvatarImage src={value || undefined} alt={name} />
+          <AvatarFallback>{initials(name)}</AvatarFallback>
+        </Avatar>
+        <span className="absolute inset-x-0 bottom-0 mx-auto grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25">
+          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+        </span>
+        <input className="sr-only" type="file" accept="image/png,image/jpeg,image/webp" onChange={handleFile} disabled={uploading} />
+      </label>
       <div className="min-w-0 flex-1">
-        <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-2xl bg-white px-4 text-sm font-bold text-foreground shadow-sm shadow-black/5">
-          {uploading ? <Loader2 className="h-4 w-4 animate-spin text-primary" /> : <Camera className="h-4 w-4 text-primary" />}
-          {uploading ? t.common.uploading : t.profile.uploadAvatar}
-          <input className="sr-only" type="file" accept="image/png,image/jpeg,image/webp" onChange={handleFile} disabled={uploading} />
-        </label>
+        <p className="text-sm font-bold">{uploading ? t.common.uploading : t.profile.uploadAvatar}</p>
+        <p className="mt-1 text-xs leading-5 text-muted-foreground">{t.profile.uploadAvatarHint}</p>
         {error ? <p className="mt-2 text-xs text-destructive">{error}</p> : null}
       </div>
     </div>

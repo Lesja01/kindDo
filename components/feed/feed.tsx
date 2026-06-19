@@ -1,7 +1,7 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Filter, Loader2, X } from "lucide-react";
+import { Bookmark, Filter, Loader2, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { Dream, Story } from "@/types/database";
 
 const PAGE_SIZE = 5;
-const categories = ["Family", "Health", "Learning", "Home", "Work", "Adventure", "Other"];
+const categories = ["Family", "Health", "Learning", "Home", "Work", "Travel", "Creativity", "Sport", "Kids", "Community"];
 const CUSTOM_AREA = "__custom__";
 
 async function fetchPage<T>(url: string, page: number, filters?: FeedFilters): Promise<T[]> {
@@ -26,6 +26,7 @@ async function fetchPage<T>(url: string, page: number, filters?: FeedFilters): P
   if (filters?.location) params.set("location", filters.location);
   if (filters?.ageFrom) params.set("ageFrom", filters.ageFrom);
   if (filters?.ageTo) params.set("ageTo", filters.ageTo);
+  if (filters?.favoritesOnly) params.set("favorites", "1");
 
   const response = await fetch(`${url}?${params.toString()}`);
   if (!response.ok) throw new Error("Unable to load feed");
@@ -38,11 +39,12 @@ type FeedFilters = {
   areaPreset: string;
   ageFrom: string;
   ageTo: string;
+  favoritesOnly: boolean;
 };
 
 export function Feed({ viewerId }: { viewerId: string | null }) {
   const { t } = useI18n();
-  const [filters, setFilters] = useState<FeedFilters>({ categories: [], location: "", areaPreset: "", ageFrom: "", ageTo: "" });
+  const [filters, setFilters] = useState<FeedFilters>({ categories: [], location: "", areaPreset: "", ageFrom: "", ageTo: "", favoritesOnly: false });
   const dreams = useInfiniteQuery({
     queryKey: ["dreams", filters],
     queryFn: ({ pageParam }) => fetchPage<Dream>("/api/dreams", pageParam, filters),
@@ -105,7 +107,8 @@ function DreamFilters({ filters, onChange }: { filters: FeedFilters; onChange: (
     ...filters.categories.map((category) => t.categories[category as keyof typeof t.categories] ?? category),
     selectedArea ? (locale === "ru" ? selectedArea.labelRu : selectedArea.labelEn) : filters.location,
     filters.ageFrom ? `${t.common.ageFrom}: ${filters.ageFrom}` : "",
-    filters.ageTo ? `${t.common.ageTo}: ${filters.ageTo}` : ""
+    filters.ageTo ? `${t.common.ageTo}: ${filters.ageTo}` : "",
+    filters.favoritesOnly ? t.common.favorites : ""
   ].filter(Boolean);
 
   function update(next: Partial<FeedFilters>) {
@@ -113,7 +116,7 @@ function DreamFilters({ filters, onChange }: { filters: FeedFilters; onChange: (
   }
 
   function reset() {
-    onChange({ categories: [], location: "", areaPreset: "", ageFrom: "", ageTo: "" });
+    onChange({ categories: [], location: "", areaPreset: "", ageFrom: "", ageTo: "", favoritesOnly: false });
   }
 
   function toggleCategory(category: string) {
@@ -124,7 +127,7 @@ function DreamFilters({ filters, onChange }: { filters: FeedFilters; onChange: (
   }
 
   return (
-    <div className="relative mx-3 mb-1">
+    <div className="relative mx-3 mb-1 mt-3">
       <div className="flex min-h-9 items-center gap-2">
         <button
           type="button"
@@ -137,6 +140,18 @@ function DreamFilters({ filters, onChange }: { filters: FeedFilters; onChange: (
           <Filter className="h-3.5 w-3.5" />
           {t.common.filters}
           {activeFilters.length ? <span className="ml-0.5">{activeFilters.length}</span> : null}
+        </button>
+
+        <button
+          type="button"
+          className={cn(
+            "grid h-9 w-9 shrink-0 place-items-center rounded-full shadow-sm shadow-black/5 transition-colors",
+            filters.favoritesOnly ? "bg-primary text-primary-foreground" : "bg-white text-muted-foreground"
+          )}
+          aria-label={t.common.favorites}
+          onClick={() => update({ favoritesOnly: !filters.favoritesOnly })}
+        >
+          <Bookmark className={cn("h-4 w-4", filters.favoritesOnly && "fill-current")} />
         </button>
 
         <div className="scrollbar-none flex min-w-0 flex-1 gap-1.5 overflow-x-auto">
@@ -167,11 +182,21 @@ function DreamFilters({ filters, onChange }: { filters: FeedFilters; onChange: (
         <div className="absolute inset-x-0 top-11 z-30 space-y-4 rounded-3xl bg-white p-3 shadow-2xl shadow-black/15 ring-1 ring-black/5">
           <div className="mb-3 flex items-center justify-between gap-3">
             <p className="text-sm font-bold">{t.common.filters}</p>
-            {activeFilters.length ? (
-              <Button className="h-7 rounded-full px-2 text-xs" variant="ghost" onClick={reset}>
-                {t.common.reset}
-              </Button>
-            ) : null}
+            <div className="flex items-center gap-1">
+              {activeFilters.length ? (
+                <Button className="h-7 rounded-full px-2 text-xs" variant="ghost" onClick={reset}>
+                  {t.common.reset}
+                </Button>
+              ) : null}
+              <button
+                type="button"
+                className="grid h-8 w-8 place-items-center rounded-full bg-background text-muted-foreground"
+                aria-label={t.common.close}
+                onClick={() => setOpen(false)}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
           <FilterGroup title={t.common.allCategories}>

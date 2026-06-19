@@ -22,10 +22,26 @@ export async function GET(request: NextRequest) {
   const location = request.nextUrl.searchParams.get("location");
   const ageFrom = request.nextUrl.searchParams.get("ageFrom");
   const ageTo = request.nextUrl.searchParams.get("ageTo");
+  const favoritesOnly = request.nextUrl.searchParams.get("favorites") === "1";
   const from = page * limit;
   const to = from + limit - 1;
 
   let authorIds: string[] | null = null;
+  let favoriteDreamIds: string[] | null = null;
+
+  if (favoritesOnly) {
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
+
+    if (!user) return NextResponse.json([]);
+
+    const { data: favorites, error: favoritesError } = await supabase.from("favorites").select("dream_id").eq("user_id", user.id);
+    if (favoritesError) return NextResponse.json({ error: favoritesError.message }, { status: 500 });
+
+    favoriteDreamIds = (favorites ?? []).map((favorite) => favorite.dream_id);
+    if (!favoriteDreamIds.length) return NextResponse.json([]);
+  }
 
   if (location || ageFrom || ageTo) {
     let usersQuery = supabase.from("users").select("id");
@@ -53,6 +69,7 @@ export async function GET(request: NextRequest) {
 
   if (categories.length) dreamsQuery = dreamsQuery.in("category", categories);
   if (authorIds) dreamsQuery = dreamsQuery.in("author_id", authorIds);
+  if (favoriteDreamIds) dreamsQuery = dreamsQuery.in("id", favoriteDreamIds);
 
   const { data, error } = await dreamsQuery.range(from, to);
 

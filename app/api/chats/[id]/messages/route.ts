@@ -24,9 +24,23 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   const { id } = await params;
   const body = await request.json();
+  const text = typeof body.text === "string" ? body.text.trim() : "";
+  const attachmentType = ["image", "contact", "location"].includes(body.attachment_type) ? body.attachment_type : null;
+
+  if (!text && !attachmentType) {
+    return NextResponse.json({ error: "Message is empty" }, { status: 400 });
+  }
+
   const { data, error } = await supabase
     .from("messages")
-    .insert({ chat_id: id, sender_id: user.id, text: body.text })
+    .insert({
+      chat_id: id,
+      sender_id: user.id,
+      text,
+      attachment_type: attachmentType,
+      attachment_url: typeof body.attachment_url === "string" ? body.attachment_url : null,
+      attachment_payload: body.attachment_payload && typeof body.attachment_payload === "object" ? body.attachment_payload : null
+    })
     .select("*, sender:users(*)")
     .single();
 

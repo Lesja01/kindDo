@@ -3,20 +3,37 @@ import type React from "react";
 import { redirect } from "next/navigation";
 import { ExternalLink, Instagram, MapPin, Music2, Send } from "lucide-react";
 import { ProfileForm } from "@/components/profile/profile-form";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ProfilePhotoGallery } from "@/components/profile/profile-photo-gallery";
+import { ProfileHeaderAvatarUpload } from "@/components/profile/profile-header-avatar-upload";
+import { FeedbackForm } from "@/components/profile/feedback-form";
+import { SignOutButton } from "@/components/profile/sign-out-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProfileAboutLabel, PublicProfileButtonLabel, ReputationLabel, StatLabel } from "@/components/profile/profile-copy";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { initials } from "@/lib/utils";
 import { SocialLink } from "@/types/database";
 
 export default async function MyProfilePage() {
   const user = await requireUser();
   const supabase = await createClient();
-  const { data: profile } = await supabase.from("users").select("*").eq("id", user.id).single();
+  let { data: profile } = await supabase.from("users").select("*").eq("id", user.id).single();
+
+  if (!profile) {
+    const { data: createdProfile } = await supabase
+      .from("users")
+      .insert({
+        id: user.id,
+        name: user.user_metadata?.name ?? user.user_metadata?.full_name ?? user.email?.split("@")[0] ?? "Dreamer",
+        avatar: user.user_metadata?.avatar_url ?? null
+      })
+      .select("*")
+      .single();
+    profile = createdProfile;
+  }
+
   const { data: links } = await supabase.from("social_links").select("*").eq("user_id", user.id);
+  const { data: photos } = await supabase.from("profile_photos").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
 
   if (!profile) redirect("/login");
 
@@ -36,10 +53,7 @@ export default async function MyProfilePage() {
               <ExternalLink className="h-5 w-5" />
             </Link>
           </Button>
-          <Avatar className="absolute -bottom-12 left-1/2 h-28 w-28 -translate-x-1/2 border-4 border-white shadow-xl">
-            <AvatarImage src={profile.avatar ?? undefined} alt={profile.name} />
-            <AvatarFallback className="text-2xl">{initials(profile.name)}</AvatarFallback>
-          </Avatar>
+          <ProfileHeaderAvatarUpload userId={user.id} name={profile.name} initialAvatar={profile.avatar} />
         </div>
         <div className="space-y-5 px-4 pb-4 pt-14 text-center">
           <div>
@@ -60,11 +74,14 @@ export default async function MyProfilePage() {
         </div>
       </div>
 
-      <Button asChild variant="outline" className="h-11 w-full rounded-2xl bg-white shadow-sm shadow-black/5">
-        <Link href={`/profile/${user.id}`}>
-          <PublicProfileButtonLabel />
-        </Link>
-      </Button>
+      <div className="grid grid-cols-2 gap-3">
+        <Button asChild variant="outline" className="h-11 rounded-2xl bg-white shadow-sm shadow-black/5">
+          <Link href={`/profile/${user.id}`}>
+            <PublicProfileButtonLabel />
+          </Link>
+        </Button>
+        <SignOutButton />
+      </div>
 
       {profile.bio ? (
         <ProfileInfoCard title={<ProfileAboutLabel />}>
@@ -74,6 +91,8 @@ export default async function MyProfilePage() {
       <SocialLinksCard links={links ?? []} />
 
       <ProfileForm profile={profile} links={links ?? []} />
+      <ProfilePhotoGallery userId={user.id} initialPhotos={photos ?? []} />
+      <FeedbackForm />
     </section>
   );
 }

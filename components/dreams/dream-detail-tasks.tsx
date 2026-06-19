@@ -132,8 +132,13 @@ export function DreamDetailTasks({
                     <Trash2 className="h-4 w-4" />
                   </button>
                 ) : null}
-                {canHelp ? <TaskHelpButton dreamId={dreamId} taskId={task.id} /> : null}
               </div>
+
+              {canHelp ? (
+                <div className="mt-2 pl-8">
+                  <TaskHelpButton dreamId={dreamId} taskId={task.id} />
+                </div>
+              ) : null}
 
               {isAuthor && taskCandidates.length ? (
                 <div className="mt-2 flex items-center gap-2 pl-8">
@@ -161,12 +166,12 @@ export function DreamDetailTasks({
       {isAuthor ? (
         <form className="mt-2 flex gap-2" onSubmit={addTask}>
           <input
-            className="h-10 min-w-0 flex-1 rounded-xl border-0 bg-white px-3 text-xs outline-none ring-1 ring-border/70"
+            className="h-11 min-w-0 flex-1 rounded-xl border-0 bg-white px-3 text-base outline-none ring-1 ring-border/70 sm:text-sm"
             value={text}
             placeholder={t.dreams.taskPlaceholder}
             onChange={(event) => setText(event.target.value)}
           />
-          <button type="submit" className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground" aria-label={t.dreams.addChecklistItem}>
+          <button type="submit" className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground" aria-label={t.dreams.addChecklistItem}>
             <Plus className="h-4 w-4" />
           </button>
         </form>

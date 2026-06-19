@@ -6,7 +6,7 @@ export type Locale = "en" | "ru";
 
 const dictionaries = {
   en: {
-    nav: { home: "Home", create: "Create", stories: "Kind stories", myDreams: "My dreams", chats: "Chats", profile: "Profile" },
+    nav: { home: "Home", create: "Create", stories: "Kind stories", myDreams: "My dreams", chats: "Chats", profile: "Profile", register: "Sign up" },
     common: {
       dreamer: "Dreamer",
       you: "You",
@@ -42,15 +42,18 @@ const dictionaries = {
       reputation: "Reputation",
       saving: "Saving...",
       uploading: "Uploading...",
-      uploadVideo: "Upload photo or video"
+      uploadVideo: "Upload photo or video",
+      favorites: "Favorites",
+      close: "Close",
+      sending: "Sending..."
     },
     auth: {
-      headline: "Help one person, beautifully.",
+      headline: "Dreams become stories.",
       intro: "Sign in to post dreams, offer help, chat, and share gratitude stories.",
       google: "Continue with Google",
-      sendLink: "Send magic link",
+      sendLink: "Send sign-in link",
       sending: "Sending...",
-      checkInbox: "Check your inbox for a magic link."
+      checkInbox: "Check your inbox for the sign-in link."
     },
     dreams: {
       iWillHelp: "I will help",
@@ -59,6 +62,7 @@ const dictionaries = {
       shareIntro: "Record the feeling. One person can step in and help.",
       title: "Title",
       description: "Description",
+      descriptionPlaceholder: "Describe the dream in detail: why it matters, how it appeared, and what kind of help would move it closer.",
       category: "Category",
       visibility: "Visibility",
       publicVisibility: "Visible to everyone",
@@ -151,6 +155,13 @@ const dictionaries = {
       send: "Send message",
       loadError: "Unable to load messages",
       storyPublished: "Gratitude story is ready. Tap to watch.",
+      attachPhoto: "Attach photo",
+      shareContact: "Share contact",
+      shareLocation: "Share location",
+      contactPrompt: "Contact name, phone, or link",
+      locationShared: "Location shared",
+      contactShared: "Contact",
+      attachmentError: "Could not send attachment.",
       noMessages: "No messages yet",
       unread: "new",
       emptyTitle: "No chats yet",
@@ -182,6 +193,12 @@ const dictionaries = {
       location: "Location",
       avatar: "Avatar URL",
       uploadAvatar: "Upload photo",
+      uploadAvatarHint: "Tap the avatar to change the main photo.",
+      photos: "Profile photos",
+      uploadPhotos: "Add photos",
+      deletePhoto: "Delete photo",
+      signOut: "Sign out",
+      signingOut: "Signing out...",
       bio: "Bio",
       locationHint: "City, region, country",
       instagram: "Instagram URL",
@@ -189,7 +206,14 @@ const dictionaries = {
       telegram: "Telegram URL",
       saved: "Profile saved.",
       save: "Save profile",
-      noBio: "The dreamer has not added a bio yet."
+      noBio: "The dreamer has not added a bio yet.",
+      feedbackTitle: "Feedback",
+      feedbackIntro: "Tell us what feels unclear, missing, or especially useful.",
+      feedbackPlaceholder: "Your idea, bug, or impression",
+      feedbackContact: "Contact for reply, optional",
+      sendFeedback: "Send feedback",
+      feedbackSent: "Thank you. Feedback sent.",
+      feedbackError: "Could not send feedback."
     },
     statuses: {
       OPEN: "Open",
@@ -202,12 +226,17 @@ const dictionaries = {
       Learning: "Learning",
       Home: "Home",
       Work: "Work",
+      Travel: "Travel",
+      Creativity: "Creativity",
+      Sport: "Sport",
+      Kids: "Kids",
+      Community: "Community",
       Adventure: "Adventure",
-      Other: "Dream details"
+      Other: "Other"
     }
   },
   ru: {
-    nav: { home: "Главная", create: "Создать", stories: "Истории добрых дел", myDreams: "Мои мечты", chats: "Чаты", profile: "Профиль" },
+    nav: { home: "Главная", create: "Создать", stories: "Истории добрых дел", myDreams: "Мои мечты", chats: "Чаты", profile: "Профиль", register: "Регистрация" },
     common: {
       dreamer: "Мечтатель",
       you: "Вы",
@@ -243,13 +272,16 @@ const dictionaries = {
       reputation: "Репутация",
       saving: "Сохраняем...",
       uploading: "Загружаем...",
-      uploadVideo: "Загрузить фото или видео"
+      uploadVideo: "Загрузить фото или видео",
+      favorites: "Избранное",
+      close: "Закрыть",
+      sending: "Отправляем..."
     },
     auth: {
-      headline: "Помоги одному человеку по-настоящему.",
+      headline: "Мечты становятся историями добрых дел.",
       intro: "Войдите, чтобы публиковать мечты, помогать, общаться и делиться историями благодарности.",
       google: "Войти через Google",
-      sendLink: "Отправить magic link",
+      sendLink: "Отправить ссылку для входа",
       sending: "Отправляем...",
       checkInbox: "Проверьте почту: мы отправили ссылку для входа."
     },
@@ -260,6 +292,7 @@ const dictionaries = {
       shareIntro: "Запишите живое видео. Один человек сможет откликнуться и помочь.",
       title: "Название",
       description: "Описание",
+      descriptionPlaceholder: "Опишите мечту подробнее: почему она важна, как появилась и какая помощь приблизит её исполнение.",
       category: "Категория",
       visibility: "Видимость",
       publicVisibility: "Видима всем",
@@ -352,6 +385,13 @@ const dictionaries = {
       send: "Отправить сообщение",
       loadError: "Не удалось загрузить сообщения",
       storyPublished: "История благодарности готова. Нажмите, чтобы посмотреть.",
+      attachPhoto: "Прикрепить фото",
+      shareContact: "Отправить контакт",
+      shareLocation: "Отправить геопозицию",
+      contactPrompt: "Имя, телефон или ссылка на контакт",
+      locationShared: "Геопозиция отправлена",
+      contactShared: "Контакт",
+      attachmentError: "Не удалось отправить вложение.",
       noMessages: "Сообщений пока нет",
       unread: "новых",
       emptyTitle: "Чатов пока нет",
@@ -383,6 +423,12 @@ const dictionaries = {
       location: "Локация",
       avatar: "URL аватара",
       uploadAvatar: "Загрузить фото",
+      uploadAvatarHint: "Нажмите на аватар, чтобы сменить главное фото.",
+      photos: "Фото профиля",
+      uploadPhotos: "Добавить фото",
+      deletePhoto: "Удалить фото",
+      signOut: "Выйти",
+      signingOut: "Выходим...",
       bio: "О себе",
       locationHint: "Город, область, страна",
       instagram: "Instagram URL",
@@ -390,7 +436,14 @@ const dictionaries = {
       telegram: "Telegram URL",
       saved: "Профиль сохранён.",
       save: "Сохранить профиль",
-      noBio: "Мечтатель пока не добавил описание о себе."
+      noBio: "Мечтатель пока не добавил описание о себе.",
+      feedbackTitle: "Обратная связь",
+      feedbackIntro: "Расскажите, что непонятно, чего не хватает или что особенно понравилось.",
+      feedbackPlaceholder: "Идея, ошибка или впечатление",
+      feedbackContact: "Контакт для ответа, необязательно",
+      sendFeedback: "Отправить отзыв",
+      feedbackSent: "Спасибо. Отзыв отправлен.",
+      feedbackError: "Не удалось отправить отзыв."
     },
     statuses: {
       OPEN: "Открыта",
@@ -403,8 +456,13 @@ const dictionaries = {
       Learning: "Обучение",
       Home: "Дом",
       Work: "Работа",
-      Adventure: "Приключение",
-      Other: "Детали мечты"
+      Travel: "Путешествия",
+      Creativity: "Творчество",
+      Sport: "Спорт",
+      Kids: "Дети",
+      Community: "Для людей",
+      Adventure: "Приключения",
+      Other: "Другое"
     }
   }
 };
@@ -420,7 +478,7 @@ type I18nContextValue = {
 const I18nContext = createContext<I18nContextValue | null>(null);
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("en");
+  const [locale, setLocaleState] = useState<Locale>("ru");
 
   useEffect(() => {
     const stored = window.localStorage.getItem("dream-locale");

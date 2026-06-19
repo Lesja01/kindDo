@@ -3,29 +3,29 @@ import { LegalPage } from "@/components/legal/legal-page";
 export default function PrivacyPage() {
   return (
     <LegalPage
-      title="Privacy"
-      intro="KindDo stores only the information needed to help people publish dreams, communicate, and share gratitude stories."
+      title="Конфиденциальность"
+      intro="KindDo хранит только те данные, которые нужны, чтобы публиковать мечты, общаться, выбирать помощника и делиться историями добрых дел."
       sections={[
         {
-          title: "What we collect",
+          title: "Какие данные мы используем",
           body: [
-            "Profile information such as name, avatar, bio, age, location, and social links.",
-            "Dreams, photos, videos, gratitude stories, chat messages, and reports you submit."
+            "Профиль: имя, аватар, описание, возраст, локация и ссылки на социальные сети.",
+            "Контент: мечты, фото, видео, истории благодарности, сообщения в чатах и жалобы, которые вы отправляете."
           ]
         },
         {
-          title: "How it is used",
+          title: "Зачем это нужно",
           body: [
-            "Public dreams and stories are shown to other users so they can understand the dream and offer help.",
-            "Private dreams are intended to be visible only to their author.",
-            "Reports are used for moderation and safety review."
+            "Открытые мечты и истории видны другим пользователям, чтобы они могли понять ситуацию и предложить реальную помощь.",
+            "Скрытые мечты предназначены только для автора и не появляются в общей ленте.",
+            "Жалобы нужны для проверки безопасности и качества сообщества."
           ]
         },
         {
-          title: "Your responsibility",
+          title: "Что важно не публиковать",
           body: [
-            "Do not publish sensitive personal data, documents, passwords, financial details, or private addresses.",
-            "Use chat thoughtfully and report unsafe content or behavior."
+            "Не публикуйте документы, пароли, банковские данные, точные домашние адреса и другую чувствительную информацию.",
+            "Используйте чат бережно: уточняйте детали помощи и сообщайте о небезопасном поведении."
           ]
         }
       ]}

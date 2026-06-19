@@ -23,10 +23,10 @@ export function AuthForm() {
     setLoading(true);
     setMessage("");
 
-    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
+    const redirectTo = `${window.location.origin}/auth/confirm?next=${encodeURIComponent(next)}`;
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: redirectTo }
+      options: { emailRedirectTo: redirectTo, shouldCreateUser: true }
     });
 
     setLoading(false);

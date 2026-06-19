@@ -12,9 +12,9 @@ export default function LoginPage() {
           <AuthForm />
         </Suspense>
         <div className="flex justify-center gap-4 text-xs font-bold text-muted-foreground">
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/terms">Terms</Link>
-          <Link href="/safety">Safety</Link>
+          <Link href="/privacy">Конфиденциальность</Link>
+          <Link href="/terms">Правила</Link>
+          <Link href="/safety">Безопасность</Link>
         </div>
       </div>
     </section>

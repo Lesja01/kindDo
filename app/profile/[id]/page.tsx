@@ -16,11 +16,12 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const { data: profile } = await supabase.from("users").select("*").eq("id", id).single();
   if (!profile) notFound();
 
-  const [{ count: dreamsCreated }, { count: dreamsHelped }, { count: gratitudeStories }, { data: links }] = await Promise.all([
+  const [{ count: dreamsCreated }, { count: dreamsHelped }, { count: gratitudeStories }, { data: links }, { data: photos }] = await Promise.all([
     supabase.from("dreams").select("id", { count: "exact", head: true }).eq("author_id", id),
     supabase.from("dreams").select("id", { count: "exact", head: true }).eq("helper_id", id),
     supabase.from("stories").select("id", { count: "exact", head: true }).eq("author_id", id),
-    supabase.from("social_links").select("*").eq("user_id", id)
+    supabase.from("social_links").select("*").eq("user_id", id),
+    supabase.from("profile_photos").select("*").eq("user_id", id).order("created_at", { ascending: false })
   ]);
 
   return (
@@ -68,6 +69,19 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             <ProfileAboutLabel />
           </h2>
           <p className="mt-3 leading-7 text-muted-foreground">{profile.bio}</p>
+        </section>
+      ) : null}
+
+      {photos?.length ? (
+        <section className="rounded-3xl bg-white p-4 shadow-sm shadow-black/5">
+          <h2 className="text-sm font-bold uppercase text-muted-foreground">Фото</h2>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {photos.map((photo) => (
+              <div key={photo.id} className="aspect-square overflow-hidden rounded-2xl bg-background">
+                <img src={photo.url} alt="" className="h-full w-full object-cover" />
+              </div>
+            ))}
+          </div>
         </section>
       ) : null}
 
