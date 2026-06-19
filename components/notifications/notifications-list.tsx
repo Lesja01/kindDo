@@ -29,7 +29,7 @@ const toneByKind = {
 };
 
 export function NotificationsList({ items }: { items: NotificationItem[] }) {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
 
   if (!items.length) {
     return <EmptyState title={t.common.noNotifications} description={t.common.noNotificationsDescription} />;
@@ -63,7 +63,7 @@ export function NotificationsList({ items }: { items: NotificationItem[] }) {
               <span className="block truncate text-sm font-bold text-foreground">{title}</span>
               <span className="mt-1 block truncate text-xs leading-5 text-muted-foreground">{subtitle}</span>
             </span>
-            <span className="self-start whitespace-nowrap pt-1 text-[11px] font-medium text-muted-foreground">{timeAgo(item.createdAt)}</span>
+            <span className="self-start whitespace-nowrap pt-1 text-[11px] font-medium text-muted-foreground">{timeAgo(item.createdAt, locale)}</span>
           </Link>
         );
       })}

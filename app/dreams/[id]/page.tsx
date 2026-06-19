@@ -2,9 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, CalendarDays, MapPin, MessageCircle, PlayCircle, UserRound } from "lucide-react";
 import { HelpButton } from "@/components/dreams/help-button";
-import { DreamTaskDeleteButton } from "@/components/dreams/dream-task-delete-button";
-import { TaskCompleteButton } from "@/components/dreams/task-complete-button";
-import { TaskHelpButton } from "@/components/dreams/task-help-button";
+import { DreamDetailTasks, TaskCandidate } from "@/components/dreams/dream-detail-tasks";
 import { MediaViewer } from "@/components/media/media-viewer";
 import {
   CategoryLabel,
@@ -16,8 +14,7 @@ import {
   DreamerFallback,
   OpenChatLabel,
   SignInToHelpLabel,
-  StatusLabel,
-  TaskCompletedByAuthorLabel
+  StatusLabel
 } from "@/components/dreams/dream-detail-copy";
 import { CreateStoryForm } from "@/components/stories/create-story-form";
 import { ReportButton } from "@/components/reports/report-button";
@@ -28,7 +25,7 @@ import { getUser } from "@/lib/auth";
 import { isImageUrl } from "@/lib/media";
 import { createClient } from "@/lib/supabase/server";
 import { initials, timeAgo } from "@/lib/utils";
-import { DreamTask } from "@/types/database";
+import { Profile } from "@/types/database";
 
 export default async function DreamDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -44,7 +41,7 @@ export default async function DreamDetailPage({ params }: { params: Promise<{ id
   if (!dream) notFound();
 
   const [{ data: chats }, { data: tasks }] = await Promise.all([
-    supabase.from("chats").select("id,task_id").eq("dream_id", id).limit(20),
+    supabase.from("chats").select("id,task_id,user_2,candidate:users!chats_user_2_fkey(*)").eq("dream_id", id).limit(50),
     supabase.from("dream_tasks").select("*, helper:users!dream_tasks_helper_id_fkey(*)").eq("dream_id", id).order("created_at", { ascending: true })
   ]);
   const chat = (chats ?? []).find((item) => !item.task_id) ?? (chats ?? [])[0] ?? null;
@@ -52,6 +49,10 @@ export default async function DreamDetailPage({ params }: { params: Promise<{ id
   const isHelper = user?.id === dream.helper_id;
   const hasTasks = Boolean(tasks?.length);
   const isImage = isImageUrl(dream.video_url);
+  const candidates: TaskCandidate[] = (chats ?? []).map((item) => {
+    const candidate = Array.isArray(item.candidate) ? item.candidate[0] : item.candidate;
+    return { id: item.id, task_id: item.task_id, candidate: (candidate as Profile | null) ?? null };
+  });
 
   return (
     <article className="min-h-dvh px-4 py-4">
@@ -118,7 +119,9 @@ export default async function DreamDetailPage({ params }: { params: Promise<{ id
             <DreamAboutLabel />
           </h3>
           <p className="mt-3 leading-7 text-muted-foreground">{dream.description}</p>
-          {hasTasks ? <DreamTaskList dreamId={dream.id} tasks={tasks ?? []} isAuthor={isAuthor} userId={user?.id ?? null} /> : null}
+          {hasTasks || isAuthor ? (
+            <DreamDetailTasks dreamId={dream.id} initialTasks={tasks ?? []} candidates={candidates} isAuthor={isAuthor} userId={user?.id ?? null} />
+          ) : null}
           {!hasTasks && user && dream.status === "OPEN" && !isAuthor ? (
             <div className="mt-4">
               <HelpButton dreamId={dream.id} />
@@ -164,37 +167,6 @@ export default async function DreamDetailPage({ params }: { params: Promise<{ id
         {isAuthor && dream.status === "TAKEN" ? <CreateStoryForm dreamId={dream.id} dreamTitle={dream.title} helperName={dream.helper?.name ?? null} /> : null}
       </div>
     </article>
-  );
-}
-
-function DreamTaskList({ dreamId, tasks, isAuthor, userId }: { dreamId: string; tasks: DreamTask[]; isAuthor: boolean; userId: string | null }) {
-  return (
-    <div className="mt-4 rounded-2xl bg-background p-2">
-      <div className="space-y-2">
-        {tasks.map((task) => {
-          const helper = Array.isArray(task.helper) ? task.helper[0] : task.helper;
-          const canHelp = !isAuthor && userId && task.status === "OPEN" && !task.helper_id;
-
-          return (
-            <div key={task.id} className="flex items-center gap-2 rounded-xl bg-white p-2">
-              <span className={task.completed ? "grid h-5 w-5 shrink-0 place-items-center rounded-full bg-success text-success-foreground" : "h-5 w-5 shrink-0 rounded-full border border-muted-foreground/30"} />
-              <div className="min-w-0 flex-1">
-                <p className={task.completed ? "truncate text-sm font-semibold text-muted-foreground line-through" : "truncate text-sm font-semibold"}>{task.text}</p>
-                {helper ? <p className="truncate text-xs text-primary">{helper.name}</p> : null}
-                {task.completed && !task.helper_id ? (
-                  <p className="truncate text-xs font-semibold text-success">
-                    <TaskCompletedByAuthorLabel />
-                  </p>
-                ) : null}
-              </div>
-              {isAuthor && !task.completed ? <TaskCompleteButton dreamId={dreamId} taskId={task.id} /> : null}
-              {isAuthor ? <DreamTaskDeleteButton dreamId={dreamId} taskId={task.id} /> : null}
-              {canHelp ? <TaskHelpButton dreamId={dreamId} taskId={task.id} /> : null}
-            </div>
-          );
-        })}
-      </div>
-    </div>
   );
 }
 

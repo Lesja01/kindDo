@@ -44,7 +44,7 @@ function DreamSection({ title, empty, dreams }: { title: string; empty: string; 
 }
 
 function DreamRow({ dream }: { dream: DreamListItem }) {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
 
   return (
     <Link href={`/dreams/${dream.id}`}>
@@ -52,7 +52,7 @@ function DreamRow({ dream }: { dream: DreamListItem }) {
         <div className="min-w-0">
           <p className="truncate font-semibold">{dream.title}</p>
           <p className="text-sm text-muted-foreground">
-            {t.categories[dream.category as keyof typeof t.categories] ?? dream.category} · {timeAgo(dream.created_at)}
+            {t.categories[dream.category as keyof typeof t.categories] ?? dream.category} · {timeAgo(dream.created_at, locale)}
           </p>
         </div>
         <Badge className="rounded-full bg-primary/10 text-primary">{t.statuses[dream.status as DreamStatus]}</Badge>

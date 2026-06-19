@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { AvatarUpload } from "@/components/media/avatar-upload";
 import { useI18n } from "@/lib/i18n";
 import { createClient } from "@/lib/supabase/client";
 import { Profile, SocialLink } from "@/types/database";
@@ -85,6 +86,7 @@ export function ProfileForm({ profile, links }: { profile: Profile; links: Socia
       </div>
       <div className="space-y-2">
         <Label htmlFor="avatar">{t.profile.avatar}</Label>
+        <AvatarUpload value={avatar} name={name} onChange={setAvatar} />
         <Input id="avatar" className="h-10 rounded-2xl border-0 bg-background ring-1 ring-border/70" value={avatar} onChange={(event) => setAvatar(event.target.value)} />
       </div>
       <div className="space-y-2">

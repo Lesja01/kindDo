@@ -1,18 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { Bookmark, HeartHandshake, MapPin, PlayCircle } from "lucide-react";
+import { HeartHandshake, MapPin, PlayCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { VideoThumbnail } from "@/components/media/video-thumbnail";
+import { FavoriteButton } from "@/components/dreams/favorite-button";
 import { useI18n } from "@/lib/i18n";
 import { isImageUrl } from "@/lib/media";
 import { Dream } from "@/types/database";
 import { initials, timeAgo } from "@/lib/utils";
 
 export function DreamCard({ dream, viewerId }: { dream: Dream; viewerId?: string | null }) {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
   const authorDetails = [dream.author?.age, dream.author?.location].filter(Boolean).join(" · ");
   const mine = Boolean(viewerId && viewerId === dream.author_id);
   const isImage = isImageUrl(dream.video_url);
@@ -30,10 +31,10 @@ export function DreamCard({ dream, viewerId }: { dream: Dream; viewerId?: string
             {authorDetails ? (
               <>
                 <MapPin className="mr-1 inline h-3 w-3 align-[-2px]" />
-                {authorDetails} · {timeAgo(dream.created_at)}
+                {authorDetails} · {timeAgo(dream.created_at, locale)}
               </>
             ) : (
-              timeAgo(dream.created_at)
+              timeAgo(dream.created_at, locale)
             )}
           </p>
         </div>
@@ -59,7 +60,7 @@ export function DreamCard({ dream, viewerId }: { dream: Dream; viewerId?: string
           <div className="min-w-0 flex-1">
             <h2 className="line-clamp-2 text-xl font-bold tracking-normal">{dream.title}</h2>
           </div>
-          <Bookmark className="h-5 w-5 shrink-0 text-muted-foreground" />
+          <FavoriteButton dreamId={dream.id} viewerId={viewerId} />
         </div>
         <p className="line-clamp-3 text-sm leading-6 text-muted-foreground">{dream.description}</p>
         <Button asChild size="lg" className="h-12 w-full rounded-2xl shadow-lg shadow-primary/20">

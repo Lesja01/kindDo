@@ -91,7 +91,10 @@ const dictionaries = {
       thanksSent: "Gratitude sent",
       published: "Published",
       helperStatus: "Helper",
-      noHelperYet: "No one yet"
+      noHelperYet: "No one yet",
+      responded: "Responded",
+      addChecklistItem: "Add checklist item",
+      markDone: "Mark done"
     },
     stories: {
       title: "Kind stories",
@@ -178,6 +181,7 @@ const dictionaries = {
       age: "Age",
       location: "Location",
       avatar: "Avatar URL",
+      uploadAvatar: "Upload photo",
       bio: "Bio",
       locationHint: "City, region, country",
       instagram: "Instagram URL",
@@ -288,7 +292,10 @@ const dictionaries = {
       thanksSent: "Благодарность отправлена",
       published: "Опубликовано",
       helperStatus: "Поможет",
-      noHelperYet: "Ещё никто"
+      noHelperYet: "Ещё никто",
+      responded: "Откликнулись",
+      addChecklistItem: "Добавить пункт",
+      markDone: "Отметить выполненным"
     },
     stories: {
       title: "Истории добрых дел",
@@ -375,6 +382,7 @@ const dictionaries = {
       age: "Возраст",
       location: "Локация",
       avatar: "URL аватара",
+      uploadAvatar: "Загрузить фото",
       bio: "О себе",
       locationHint: "Город, область, страна",
       instagram: "Instagram URL",

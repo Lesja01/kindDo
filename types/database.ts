@@ -87,3 +87,9 @@ export type SocialLink = {
   platform: SocialPlatform;
   url: string;
 };
+
+export type Favorite = {
+  user_id: string;
+  dream_id: string;
+  created_at: string;
+};

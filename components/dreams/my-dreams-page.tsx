@@ -168,7 +168,7 @@ function DreamListCard({
   tasks: DreamTask[];
   onTasksChange: (tasks: DreamTask[]) => void;
 }) {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
 
   return (
     <article className="rounded-3xl bg-white p-2 shadow-sm shadow-black/5">
@@ -181,7 +181,7 @@ function DreamListCard({
           </div>
           <div className="mt-2 flex items-center gap-2">
             <StatusPill status={dream.status} />
-            <span className="truncate text-xs text-muted-foreground">{timeAgo(dream.created_at)}</span>
+            <span className="truncate text-xs text-muted-foreground">{timeAgo(dream.created_at, locale)}</span>
           </div>
           <p className="mt-2 line-clamp-1 text-xs font-medium text-muted-foreground">
             {t.categories[dream.category as keyof typeof t.categories] ?? dream.category}

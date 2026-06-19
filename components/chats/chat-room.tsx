@@ -29,7 +29,7 @@ export function ChatRoom({
   helperSelected: boolean;
 }) {
   const supabase = createClient();
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
   const queryClient = useQueryClient();
   const [text, setText] = useState("");
   const [selectingHelper, setSelectingHelper] = useState(false);
@@ -179,7 +179,7 @@ export function ChatRoom({
               <div key={message.id} className="flex justify-center">
                 <div className="max-w-[86%] rounded-2xl bg-success/10 px-4 py-2 text-center text-sm font-semibold text-success">
                   {t.dreams.helperSelectedMessage}
-                  <span className="mt-1 block text-[11px] font-normal opacity-75">{timeAgo(message.created_at)}</span>
+                  <span className="mt-1 block text-[11px] font-normal opacity-75">{timeAgo(message.created_at, locale)}</span>
                 </div>
               </div>
             );
@@ -193,7 +193,7 @@ export function ChatRoom({
                   className="max-w-[86%] rounded-2xl border bg-accent px-4 py-3 text-center text-sm font-semibold text-accent-foreground shadow-sm"
                 >
                   {t.chats.storyPublished}
-                  <span className="mt-1 block text-[11px] font-normal opacity-75">{timeAgo(message.created_at)}</span>
+                  <span className="mt-1 block text-[11px] font-normal opacity-75">{timeAgo(message.created_at, locale)}</span>
                 </Link>
               </div>
             );
@@ -209,7 +209,7 @@ export function ChatRoom({
                     </div>
                   ) : null}
                   {taskThanks.text ? <p className="text-sm font-semibold leading-6">{taskThanks.text}</p> : null}
-                  <span className="mt-1 block text-[11px] text-muted-foreground">{timeAgo(message.created_at)}</span>
+                  <span className="mt-1 block text-[11px] text-muted-foreground">{timeAgo(message.created_at, locale)}</span>
                 </div>
               </div>
             );
@@ -235,7 +235,7 @@ export function ChatRoom({
                 >
                   <p className="leading-6">{message.text}</p>
                   <p className={cn("mt-1 text-[11px]", mine ? "text-primary-foreground/70" : "text-muted-foreground")}>
-                    {timeAgo(message.created_at)}
+                    {timeAgo(message.created_at, locale)}
                   </p>
                 </div>
               </div>

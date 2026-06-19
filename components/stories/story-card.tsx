@@ -12,7 +12,7 @@ import { Story } from "@/types/database";
 import { initials, timeAgo } from "@/lib/utils";
 
 export function StoryCard({ story }: { story: Story }) {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
   const isImage = isImageUrl(story.video_url);
 
   return (
@@ -25,7 +25,7 @@ export function StoryCard({ story }: { story: Story }) {
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-bold text-foreground">{story.author?.name ?? t.common.dreamer}</p>
           <p className="truncate text-xs text-muted-foreground">
-            {t.common.with} {story.helper?.name ?? t.common.helper} · {timeAgo(story.created_at)}
+            {t.common.with} {story.helper?.name ?? t.common.helper} · {timeAgo(story.created_at, locale)}
           </p>
         </div>
         <Badge className="rounded-full border-0 bg-success/10 text-success">{t.stories.fulfilledBadge}</Badge>
