@@ -2,9 +2,9 @@
   "name": "dream-social-platform",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@11.0.7",
+  "packageManager": "pnpm@10.13.1",
   "engines": {
-    "node": ">=20"
+    "node": "22.x"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
