@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="kinddo-icon-gradient" x1="12" x2="52" y1="52" y2="12" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF7A59" />
+      <stop offset="1" stop-color="#4ECDC4" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="22" fill="#FAF8F4" />
+  <rect x="5" y="5" width="54" height="54" rx="19" fill="#fff" />
+  <path
+    d="M17 39.5c4.7-5.1 9.1-7.6 13.4-7.6h6.1c2.2 0 3.9 1.6 3.9 3.6 0 1.9-1.6 3.5-3.7 3.5h-7.5"
+    fill="none"
+    stroke="#FF7A59"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="5"
+  />
+  <path
+    d="M28.8 45.6h8.8c3.7 0 7.2-1.6 9.7-4.4l2.4-2.7c1.4-1.6 1.2-4-.4-5.3-1.5-1.2-3.7-1.1-5.1.2l-5.1 4.8"
+    fill="none"
+    stroke="#4ECDC4"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="5"
+  />
+  <path
+    d="M34 23.5c4.7-3.4 8.3-7.2 10.9-11.3m0 0 .8 6.9m-.8-6.9-6.8 1.2"
+    fill="none"
+    stroke="url(#kinddo-icon-gradient)"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="4.5"
+  />
+  <circle cx="30.7" cy="24.9" r="2.7" fill="#2ECC71" />
+</svg>
