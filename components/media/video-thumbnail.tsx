@@ -37,6 +37,8 @@ export function VideoThumbnail({ src, className }: { src: string; className?: st
         ref={videoRef}
         className={cn("h-full w-full object-cover transition-opacity duration-200", loaded ? "opacity-100" : "opacity-0")}
         src={thumbnailSrc}
+        autoPlay
+        loop
         muted
         playsInline
         preload="auto"

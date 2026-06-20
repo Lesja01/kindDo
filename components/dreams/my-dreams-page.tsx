@@ -2,7 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Check, Eye, EyeOff, Grid3X3, List, Plus, Search, Trash2 } from "lucide-react";
+import { ArrowLeft, Check, Eye, EyeOff, GripVertical, Grid3X3, List, Plus, Search, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -14,27 +14,54 @@ import { Dream, DreamStatus, DreamTask } from "@/types/database";
 
 type MyDreamItem = Pick<Dream, "id" | "title" | "description" | "video_url" | "category" | "status" | "visibility" | "created_at"> & {
   tasks?: DreamTask[];
+  media?: Dream["media"];
 };
 type DreamTab = "active" | "completed";
 type VisibilityFilter = "all" | "public" | "private";
 
 export function MyDreamsPage({ published, hidden }: { published: MyDreamItem[]; hidden: MyDreamItem[] }) {
   const { t } = useI18n();
+  const [dreamItems, setDreamItems] = useState(() => [...published, ...hidden]);
   const [tab, setTab] = useState<DreamTab>("active");
   const [view, setView] = useState<"list" | "grid">("list");
   const [visibility, setVisibility] = useState<VisibilityFilter>("all");
+  const [draggedId, setDraggedId] = useState<string | null>(null);
   const [tasksByDream, setTasksByDream] = useState<Record<string, DreamTask[]>>(() =>
     Object.fromEntries([...published, ...hidden].map((dream) => [dream.id, dream.tasks ?? []]))
   );
 
   const dreams = useMemo(
-    () => [...published, ...hidden].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
-    [published, hidden]
+    () => dreamItems,
+    [dreamItems]
   );
   const activeDreams = dreams.filter((dream) => dream.status !== "COMPLETED");
   const completedDreams = dreams.filter((dream) => dream.status === "COMPLETED");
   const tabDreams = tab === "active" ? activeDreams : completedDreams;
   const visibleDreams = visibility === "all" ? tabDreams : tabDreams.filter((dream) => dream.visibility === visibility);
+
+  async function persistOrder(nextDreams: MyDreamItem[]) {
+    await fetch("/api/dreams/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: nextDreams.map((dream) => dream.id) })
+    });
+  }
+
+  function moveDream(targetId: string) {
+    if (!draggedId || draggedId === targetId) return;
+    const currentIds = visibleDreams.map((dream) => dream.id);
+    const from = currentIds.indexOf(draggedId);
+    const to = currentIds.indexOf(targetId);
+    if (from < 0 || to < 0) return;
+
+    const reorderedVisible = [...visibleDreams];
+    const [moved] = reorderedVisible.splice(from, 1);
+    reorderedVisible.splice(to, 0, moved);
+    const reorderedIds = new Set(reorderedVisible.map((dream) => dream.id));
+    const nextDreams = dreams.map((dream) => (reorderedIds.has(dream.id) ? reorderedVisible.shift() ?? dream : dream));
+    setDreamItems(nextDreams);
+    persistOrder(nextDreams);
+  }
 
   return (
     <section className="min-h-dvh px-4 py-4">
@@ -94,7 +121,14 @@ export function MyDreamsPage({ published, hidden }: { published: MyDreamItem[]; 
           <div className={view === "grid" ? "grid grid-cols-3 gap-2" : "space-y-3"}>
             {visibleDreams.map((dream) =>
               view === "grid" ? (
-                <DreamGridCard key={dream.id} dream={dream} taskCount={tasksByDream[dream.id]?.length ?? 0} />
+                <DreamGridCard
+                  key={dream.id}
+                  dream={dream}
+                  taskCount={tasksByDream[dream.id]?.length ?? 0}
+                  onDragStart={() => setDraggedId(dream.id)}
+                  onDragEnter={() => moveDream(dream.id)}
+                  onDragEnd={() => setDraggedId(null)}
+                />
               ) : (
                 <DreamListCard
                   key={dream.id}
@@ -169,14 +203,19 @@ function DreamListCard({
   onTasksChange: (tasks: DreamTask[]) => void;
 }) {
   const { locale, t } = useI18n();
+  const primaryMedia = dream.media?.sort((a, b) => a.position - b.position)[0]?.url ?? dream.video_url;
 
   return (
     <article className="rounded-3xl bg-white p-2 shadow-sm shadow-black/5">
-      <Link href={`/dreams/${dream.id}`} className="flex gap-3 transition-transform active:scale-[0.99]">
-        <VideoThumbnail className="h-32 w-36 shrink-0 rounded-2xl" src={dream.video_url} />
+      <div className="flex gap-3">
+        <Link href={`/dreams/${dream.id}`} className="transition-transform active:scale-[0.99]">
+        <VideoThumbnail className="h-32 w-36 shrink-0 rounded-2xl" src={primaryMedia} />
+        </Link>
         <div className="min-w-0 flex-1 py-1 pr-1">
           <div className="flex items-start justify-between gap-2">
-            <p className="line-clamp-2 text-base font-extrabold leading-5">{dream.title}</p>
+            <Link href={`/dreams/${dream.id}`} className="line-clamp-2 text-base font-extrabold leading-5">
+              {dream.title}
+            </Link>
             <VisibilityBadge visibility={dream.visibility} compact />
           </div>
           <div className="mt-2 flex items-center gap-2">
@@ -187,21 +226,50 @@ function DreamListCard({
             {t.categories[dream.category as keyof typeof t.categories] ?? dream.category}
           </p>
         </div>
-      </Link>
+      </div>
       <DreamTasks dreamId={dream.id} tasks={tasks} onChange={onTasksChange} />
     </article>
   );
 }
 
-function DreamGridCard({ dream, taskCount }: { dream: MyDreamItem; taskCount: number }) {
+function DreamGridCard({
+  dream,
+  taskCount,
+  onDragStart,
+  onDragEnter,
+  onDragEnd
+}: {
+  dream: MyDreamItem;
+  taskCount: number;
+  onDragStart: () => void;
+  onDragEnter: () => void;
+  onDragEnd: () => void;
+}) {
+  const { t } = useI18n();
+  const primaryMedia = dream.media?.sort((a, b) => a.position - b.position)[0]?.url ?? dream.video_url;
   return (
-    <Link href={`/dreams/${dream.id}`} className="group block">
+    <Link
+      href={`/dreams/${dream.id}`}
+      className="group block"
+      draggable
+      onDragStart={onDragStart}
+      onDragEnter={(event) => {
+        event.preventDefault();
+        onDragEnter();
+      }}
+      onDragOver={(event) => event.preventDefault()}
+      onDragEnd={onDragEnd}
+      title={t.dreams.dragToReorder}
+    >
       <article className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-black shadow-sm shadow-black/5">
-        <VideoThumbnail className="h-full w-full" src={dream.video_url} />
+        <VideoThumbnail className="h-full w-full" src={primaryMedia} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
         <div className="absolute left-2 top-2">
           <VisibilityBadge visibility={dream.visibility} compact />
         </div>
+        <span className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-black/40 text-white backdrop-blur">
+          <GripVertical className="h-4 w-4" />
+        </span>
         <div className="absolute inset-x-2 bottom-2 space-y-1">
           <StatusPill status={dream.status} compact />
           {taskCount ? <span className="rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-bold text-foreground">{taskCount}</span> : null}
@@ -272,12 +340,12 @@ function DreamTasks({ dreamId, tasks, onChange }: { dreamId: string; tasks: Drea
   }
 
   return (
-    <div className="mt-3 rounded-2xl bg-background p-2">
+    <div className="mt-2 rounded-2xl bg-background p-2">
       <p className="px-1 text-xs font-bold uppercase text-muted-foreground">{t.dreams.tasks}</p>
-      <div className="mt-2 space-y-1.5">
+      <div className="mt-1.5 space-y-1">
         {tasks.length ? (
           tasks.map((task) => (
-            <div key={task.id} className="flex flex-wrap items-center gap-2 rounded-xl bg-white px-2 py-2">
+            <div key={task.id} className="flex flex-wrap items-center gap-2 rounded-xl bg-white px-2 py-1.5">
               <button
                 type="button"
                 className={cn(
@@ -414,7 +482,7 @@ function VisibilityBadge({ visibility, compact = false }: { visibility: Dream["v
     <span
       className={cn(
         "inline-flex shrink-0 items-center gap-1 rounded-full bg-background/90 font-bold text-muted-foreground",
-        compact ? "px-1.5 py-1 text-[10px]" : "px-2 py-1 text-[10px]"
+        compact ? "px-2.5 py-1 text-[10px]" : "px-2.5 py-1 text-[10px]"
       )}
     >
       {isPublic ? <Eye className="h-3 w-3 text-success" /> : <EyeOff className="h-3 w-3 text-muted-foreground" />}

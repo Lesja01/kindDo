@@ -9,8 +9,9 @@ export default async function MyDreamsRoute() {
 
   const { data: dreams } = await supabase
     .from("dreams")
-    .select("id,title,description,video_url,category,status,visibility,created_at")
+    .select("id,title,description,video_url,category,status,visibility,created_at,display_order,media:dream_media(*)")
     .eq("author_id", user.id)
+    .order("display_order", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
 
   const dreamIds = (dreams ?? []).map((dream) => dream.id);

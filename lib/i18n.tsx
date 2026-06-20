@@ -16,6 +16,7 @@ const dictionaries = {
       loadMore: "Load more",
       caughtUp: "You are caught up.",
       email: "Email",
+      phone: "Phone",
       message: "Message",
       dreams: "Dreams",
       worldDreams: "World dreams",
@@ -43,8 +44,12 @@ const dictionaries = {
       saving: "Saving...",
       uploading: "Uploading...",
       uploadVideo: "Upload photo or video",
+      mediaLimit: "You can upload up to 7 photos or videos.",
       favorites: "Favorites",
       close: "Close",
+      search: "Search",
+      searchPlaceholder: "Search dreams, people, stories",
+      searchEmpty: "Start typing to search",
       sending: "Sending..."
     },
     auth: {
@@ -52,8 +57,18 @@ const dictionaries = {
       intro: "Sign in to post dreams, offer help, chat, and share gratitude stories.",
       google: "Continue with Google",
       sendLink: "Send sign-in link",
+      emailTab: "Email",
+      phoneTab: "Phone",
+      phonePlaceholder: "+375291234567",
+      sendCode: "Send SMS code",
+      code: "Code",
+      codePlaceholder: "6-digit code",
+      verifyCode: "Confirm code",
+      smsSent: "We sent an SMS code.",
+      smsHint: "Enter your phone in international format.",
       sending: "Sending...",
-      checkInbox: "Check your inbox for the sign-in link."
+      checkInbox: "Check your inbox for the sign-in link.",
+      emailError: "Could not send the sign-in link. Check SMTP settings and try again."
     },
     dreams: {
       iWillHelp: "I will help",
@@ -71,7 +86,7 @@ const dictionaries = {
       privateVisibilityHint: "Only you can see it. It will not appear in the public feed.",
       post: "Post dream",
       posting: "Posting...",
-      uploadRequired: "Please upload a short dream video.",
+      uploadRequired: "Please upload at least one dream photo or video.",
       createError: "Could not create dream.",
       signInToHelp: "Sign in to help",
       openChat: "Open chat",
@@ -90,6 +105,12 @@ const dictionaries = {
       completeTaskYourself: "Complete myself",
       taskSaveError: "Could not save the task. Check Supabase migration 006/007.",
       deleteTask: "Delete",
+      editDream: "Edit dream",
+      saveDream: "Save dream",
+      deleteDream: "Delete dream",
+      deleteDreamConfirm: "Delete this dream? This cannot be undone.",
+      visibilityUpdated: "Visibility updated",
+      dragToReorder: "Hold and drag to reorder",
       sendThanks: "Send thanks",
       thanksPlaceholder: "Thank the helper personally",
       thanksSent: "Gratitude sent",
@@ -155,6 +176,12 @@ const dictionaries = {
       send: "Send message",
       loadError: "Unable to load messages",
       storyPublished: "Gratitude story is ready. Tap to watch.",
+      openDream: "Open dream",
+      deleteChat: "Hide chat",
+      deleteChatConfirm: "Hide this chat from your list?",
+      chatDeleted: "Chat hidden.",
+      editMessage: "Edit message",
+      edited: "edited",
       attachPhoto: "Attach photo",
       shareContact: "Share contact",
       shareLocation: "Share location",
@@ -168,7 +195,7 @@ const dictionaries = {
       emptyDescription: "When someone helps your dream, your conversation will appear here."
     },
     profile: {
-      viewPublic: "View public profile",
+      viewPublic: "Public profile",
       myDreams: "My dreams",
       listView: "List",
       gridView: "Grid",
@@ -216,8 +243,8 @@ const dictionaries = {
       feedbackError: "Could not send feedback."
     },
     statuses: {
-      OPEN: "Open",
-      TAKEN: "Taken",
+      OPEN: "New",
+      TAKEN: "In progress",
       COMPLETED: "Completed"
     },
     categories: {
@@ -246,6 +273,7 @@ const dictionaries = {
       loadMore: "Загрузить ещё",
       caughtUp: "Вы всё посмотрели.",
       email: "Email",
+      phone: "Телефон",
       message: "Сообщение",
       dreams: "Мечты",
       worldDreams: "Мечты мира",
@@ -273,8 +301,12 @@ const dictionaries = {
       saving: "Сохраняем...",
       uploading: "Загружаем...",
       uploadVideo: "Загрузить фото или видео",
+      mediaLimit: "Можно загрузить до 7 фото или видео.",
       favorites: "Избранное",
       close: "Закрыть",
+      search: "Поиск",
+      searchPlaceholder: "Искать мечты, людей, истории",
+      searchEmpty: "Начните вводить запрос",
       sending: "Отправляем..."
     },
     auth: {
@@ -282,8 +314,18 @@ const dictionaries = {
       intro: "Войдите, чтобы публиковать мечты, помогать, общаться и делиться историями благодарности.",
       google: "Войти через Google",
       sendLink: "Отправить ссылку для входа",
+      emailTab: "Email",
+      phoneTab: "Телефон",
+      phonePlaceholder: "+375291234567",
+      sendCode: "Отправить SMS-код",
+      code: "Код",
+      codePlaceholder: "6 цифр из SMS",
+      verifyCode: "Подтвердить код",
+      smsSent: "Мы отправили SMS-код.",
+      smsHint: "Введите номер в международном формате.",
       sending: "Отправляем...",
-      checkInbox: "Проверьте почту: мы отправили ссылку для входа."
+      checkInbox: "Проверьте почту: мы отправили ссылку для входа.",
+      emailError: "Не удалось отправить ссылку. Проверьте SMTP-настройки и попробуйте ещё раз."
     },
     dreams: {
       iWillHelp: "Я помогу",
@@ -301,7 +343,7 @@ const dictionaries = {
       privateVisibilityHint: "Видна только вам и не появится в общей ленте.",
       post: "Опубликовать мечту",
       posting: "Публикуем...",
-      uploadRequired: "Загрузите короткое видео мечты.",
+      uploadRequired: "Загрузите хотя бы одно фото или видео мечты.",
       createError: "Не удалось создать мечту.",
       signInToHelp: "Войти, чтобы помочь",
       openChat: "Открыть чат",
@@ -320,6 +362,12 @@ const dictionaries = {
       completeTaskYourself: "Выполнено мной",
       taskSaveError: "Не удалось сохранить задачу. Проверьте миграции Supabase 006/007.",
       deleteTask: "Удалить",
+      editDream: "Редактировать мечту",
+      saveDream: "Сохранить мечту",
+      deleteDream: "Удалить мечту",
+      deleteDreamConfirm: "Удалить эту мечту? Действие нельзя отменить.",
+      visibilityUpdated: "Видимость обновлена",
+      dragToReorder: "Удерживайте и перетаскивайте для сортировки",
       sendThanks: "Отправить благодарность",
       thanksPlaceholder: "Поблагодарите помощника лично",
       thanksSent: "Благодарность отправлена",
@@ -385,6 +433,12 @@ const dictionaries = {
       send: "Отправить сообщение",
       loadError: "Не удалось загрузить сообщения",
       storyPublished: "История благодарности готова. Нажмите, чтобы посмотреть.",
+      openDream: "Открыть мечту",
+      deleteChat: "Скрыть чат",
+      deleteChatConfirm: "Скрыть этот чат из вашего списка?",
+      chatDeleted: "Чат скрыт.",
+      editMessage: "Редактировать сообщение",
+      edited: "изменено",
       attachPhoto: "Прикрепить фото",
       shareContact: "Отправить контакт",
       shareLocation: "Отправить геопозицию",
@@ -398,7 +452,7 @@ const dictionaries = {
       emptyDescription: "Когда кто-то поможет вашей мечте, переписка появится здесь."
     },
     profile: {
-      viewPublic: "Открыть публичный профиль",
+      viewPublic: "Публичный профиль",
       myDreams: "Мои мечты",
       listView: "Список",
       gridView: "Сетка",
@@ -446,8 +500,8 @@ const dictionaries = {
       feedbackError: "Не удалось отправить отзыв."
     },
     statuses: {
-      OPEN: "Открыта",
-      TAKEN: "Взята",
+      OPEN: "Новая",
+      TAKEN: "Исполняется",
       COMPLETED: "Завершена"
     },
     categories: {

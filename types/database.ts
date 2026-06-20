@@ -27,6 +27,15 @@ export type Dream = {
   author?: Profile | null;
   helper?: Profile | null;
   tasks?: DreamTask[];
+  media?: DreamMedia[];
+};
+
+export type DreamMedia = {
+  id: string;
+  dream_id: string;
+  url: string;
+  position: number;
+  created_at: string;
 };
 
 export type DreamTask = {
@@ -68,6 +77,7 @@ export type Message = {
   attachment_url: string | null;
   attachment_payload: Record<string, unknown> | null;
   created_at: string;
+  edited_at: string | null;
   sender?: Profile | null;
 };
 

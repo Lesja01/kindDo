@@ -5,5 +5,5 @@ export function MediaViewer({ src, className }: { src: string; className?: strin
     return <img className={className} src={src} alt="" />;
   }
 
-  return <video className={className} src={src} controls playsInline />;
+  return <video className={className} src={src} controls autoPlay muted loop playsInline />;
 }

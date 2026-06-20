@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProfileAboutLabel, StatLabel } from "@/components/profile/profile-copy";
+import { ProfilePhotoLightbox } from "@/components/profile/profile-photo-lightbox";
 import { ReportButton } from "@/components/reports/report-button";
 import { createClient } from "@/lib/supabase/server";
 import { initials } from "@/lib/utils";
@@ -75,13 +76,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       {photos?.length ? (
         <section className="rounded-3xl bg-white p-4 shadow-sm shadow-black/5">
           <h2 className="text-sm font-bold uppercase text-muted-foreground">Фото</h2>
-          <div className="mt-3 grid grid-cols-3 gap-2">
-            {photos.map((photo) => (
-              <div key={photo.id} className="aspect-square overflow-hidden rounded-2xl bg-background">
-                <img src={photo.url} alt="" className="h-full w-full object-cover" />
-              </div>
-            ))}
-          </div>
+          <ProfilePhotoLightbox photos={photos} />
         </section>
       ) : null}
 

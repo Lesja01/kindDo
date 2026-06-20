@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
 import { BottomNav } from "@/components/layout/bottom-nav";
-import { LanguageSwitcher } from "@/components/layout/language-switcher";
 
 export const metadata: Metadata = {
   title: "KindDo",
@@ -25,7 +24,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body>
         <Providers>
-          <LanguageSwitcher />
           <main className="mx-auto min-h-dvh w-full max-w-[480px] pb-24">{children}</main>
           <BottomNav />
         </Providers>

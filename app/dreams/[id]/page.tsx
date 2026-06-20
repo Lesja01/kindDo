@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, CalendarDays, MapPin, MessageCircle, PlayCircle, UserRound } from "lucide-react";
+import { CategoryLabel } from "@/components/dreams/category-label";
+import { DreamDetailEditor } from "@/components/dreams/dream-detail-editor";
+import { DreamDetailMenu } from "@/components/dreams/dream-detail-menu";
 import { HelpButton } from "@/components/dreams/help-button";
 import { DreamDetailTasks, TaskCandidate } from "@/components/dreams/dream-detail-tasks";
-import { MediaViewer } from "@/components/media/media-viewer";
+import { MediaCarousel } from "@/components/media/media-carousel";
 import {
-  CategoryLabel,
-  DreamAboutLabel,
   DreamHelperLabel,
   DreamNoHelperLabel,
   DreamPublishedLabel,
@@ -17,12 +18,10 @@ import {
   StatusLabel
 } from "@/components/dreams/dream-detail-copy";
 import { CreateStoryForm } from "@/components/stories/create-story-form";
-import { ReportButton } from "@/components/reports/report-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/auth";
-import { isImageUrl } from "@/lib/media";
 import { createClient } from "@/lib/supabase/server";
 import { initials, timeAgo } from "@/lib/utils";
 import { Profile } from "@/types/database";
@@ -34,7 +33,7 @@ export default async function DreamDetailPage({ params }: { params: Promise<{ id
 
   const { data: dream } = await supabase
     .from("dreams")
-    .select("*, author:users!dreams_author_id_fkey(*), helper:users!dreams_helper_id_fkey(*)")
+    .select("*, author:users!dreams_author_id_fkey(*), helper:users!dreams_helper_id_fkey(*), media:dream_media(*)")
     .eq("id", id)
     .single();
 
@@ -48,11 +47,21 @@ export default async function DreamDetailPage({ params }: { params: Promise<{ id
   const isAuthor = user?.id === dream.author_id;
   const isHelper = user?.id === dream.helper_id;
   const hasTasks = Boolean(tasks?.length);
-  const isImage = isImageUrl(dream.video_url);
+  const mediaUrls = ((dream.media ?? []) as { url: string; position: number }[])
+    .sort((a, b) => a.position - b.position)
+    .map((item) => item.url);
+  const dreamMediaUrls = mediaUrls.length ? mediaUrls : [dream.video_url];
   const candidates: TaskCandidate[] = (chats ?? []).map((item) => {
     const candidate = Array.isArray(item.candidate) ? item.candidate[0] : item.candidate;
     return { id: item.id, task_id: item.task_id, candidate: (candidate as Profile | null) ?? null };
   });
+  const taskHelpers = (tasks ?? [])
+    .map((task) => {
+      const helper = Array.isArray(task.helper) ? task.helper[0] : task.helper;
+      const helperChat = (chats ?? []).find((item) => item.task_id === task.id && item.user_2 === task.helper_id);
+      return helper ? { taskId: task.id, taskText: task.text, helper: helper as Profile, chatId: helperChat?.id ?? null } : null;
+    })
+    .filter((item): item is { taskId: string; taskText: string; helper: Profile; chatId: string | null } => Boolean(item));
 
   return (
     <article className="min-h-dvh px-4 py-4">
@@ -62,27 +71,12 @@ export default async function DreamDetailPage({ params }: { params: Promise<{ id
             <ArrowLeft className="h-5 w-5" />
           </Link>
         </Button>
-        <h1 className="text-center text-base font-bold tracking-normal">
-          <DreamAboutLabel />
-        </h1>
-        <ReportButton targetType="dream" targetId={dream.id} />
+        <h1 className="text-center text-base font-bold tracking-normal">{isAuthor ? "Моя мечта" : "Детали мечты"}</h1>
+        <DreamDetailMenu dreamId={dream.id} canEdit={isAuthor} />
       </div>
 
       <div className="mt-4 space-y-4">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-black shadow-xl shadow-black/10">
-          <MediaViewer className="h-full w-full object-cover" src={dream.video_url} />
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
-          {!isImage ? (
-            <div className="pointer-events-none absolute inset-0 grid place-items-center">
-              <span className="grid h-16 w-16 place-items-center rounded-full bg-black/35 text-white backdrop-blur-md">
-                <PlayCircle className="h-9 w-9 fill-white/20" />
-              </span>
-            </div>
-          ) : null}
-          <Badge className="absolute bottom-3 left-3 rounded-full border-0 bg-white/90 text-primary">
-            <CategoryLabel category={dream.category} />
-          </Badge>
-        </div>
+        <MediaCarousel urls={dreamMediaUrls} />
 
         <div className="rounded-3xl bg-white p-4 shadow-sm shadow-black/5">
           <div className="flex items-center gap-3">
@@ -107,18 +101,21 @@ export default async function DreamDetailPage({ params }: { params: Promise<{ id
               </p>
             </div>
             <Badge className="rounded-full border-0 bg-primary/10 text-primary">
-              <StatusLabel status={dream.status} />
+              <CategoryLabel category={dream.category} />
             </Badge>
           </div>
-          <h2 className="mt-4 text-2xl font-extrabold leading-tight tracking-normal">{dream.title}</h2>
-          <DreamMetaGrid helperName={dream.helper?.name ?? null} createdAt={dream.created_at} status={dream.status} />
+          <DreamDetailEditor
+            dreamId={dream.id}
+            initialTitle={dream.title}
+            initialDescription={dream.description}
+            initialCategory={dream.category}
+            initialVisibility={dream.visibility}
+            canEdit={isAuthor}
+          />
+          <DreamMetaGrid helperName={dream.helper?.name ?? null} helperCount={taskHelpers.length} createdAt={dream.created_at} status={dream.status} />
         </div>
 
         <section className="rounded-3xl bg-white p-4 shadow-sm shadow-black/5">
-          <h3 className="text-sm font-bold uppercase text-muted-foreground">
-            <DreamAboutLabel />
-          </h3>
-          <p className="mt-3 leading-7 text-muted-foreground">{dream.description}</p>
           {hasTasks || isAuthor ? (
             <DreamDetailTasks dreamId={dream.id} initialTasks={tasks ?? []} candidates={candidates} isAuthor={isAuthor} userId={user?.id ?? null} />
           ) : null}
@@ -129,7 +126,36 @@ export default async function DreamDetailPage({ params }: { params: Promise<{ id
           ) : null}
         </section>
 
-        {dream.helper ? (
+        {taskHelpers.length ? (
+          <section className="space-y-3 rounded-3xl bg-white p-4 shadow-sm shadow-black/5">
+            <p className="text-xs font-bold uppercase text-muted-foreground">
+              <DreamHelperLabel />
+            </p>
+            {taskHelpers.map((item) => (
+              <div key={item.taskId} className="flex items-center gap-3 rounded-2xl bg-background p-2">
+                <Link href={`/profile/${item.helper.id}`} className="shrink-0 rounded-full transition-transform active:scale-95">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={item.helper.avatar ?? undefined} alt={item.helper.name} />
+                  <AvatarFallback>{initials(item.helper.name)}</AvatarFallback>
+                </Avatar>
+                </Link>
+                <div className="min-w-0 flex-1">
+                  <Link href={`/profile/${item.helper.id}`} className="block truncate font-bold">
+                    {item.helper.name}
+                  </Link>
+                  <p className="truncate text-xs text-muted-foreground">{item.taskText}</p>
+                </div>
+                {item.chatId ? (
+                  <Button asChild size="sm" variant="outline" className="h-9 shrink-0 rounded-2xl bg-white px-3 text-xs">
+                    <Link href={`/chats/${item.chatId}`}>
+                      <MessageCircle className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                ) : null}
+              </div>
+            ))}
+          </section>
+        ) : dream.helper ? (
           <section className="flex items-center gap-3 rounded-3xl bg-white p-4 shadow-sm shadow-black/5">
             <Link href={`/profile/${dream.helper.id}`} className="shrink-0 rounded-full transition-transform active:scale-95" aria-label={dream.helper.name}>
               <Avatar className="h-10 w-10">
@@ -155,7 +181,7 @@ export default async function DreamDetailPage({ params }: { params: Promise<{ id
               </Link>
             </Button>
           ) : null}
-          {chat && (isAuthor || isHelper) ? (
+          {chat && (isAuthor || isHelper) && !taskHelpers.length ? (
             <Button asChild size="lg" variant="outline" className="h-12 w-full rounded-2xl bg-white shadow-lg shadow-black/5">
               <Link href={`/chats/${chat.id}`}>
                 <MessageCircle className="h-5 w-5" />
@@ -170,7 +196,17 @@ export default async function DreamDetailPage({ params }: { params: Promise<{ id
   );
 }
 
-function DreamMetaGrid({ helperName, createdAt, status }: { helperName: string | null; createdAt: string; status: "OPEN" | "TAKEN" | "COMPLETED" }) {
+function DreamMetaGrid({
+  helperName,
+  helperCount,
+  createdAt,
+  status
+}: {
+  helperName: string | null;
+  helperCount: number;
+  createdAt: string;
+  status: "OPEN" | "TAKEN" | "COMPLETED";
+}) {
   return (
     <div className="mt-4 grid grid-cols-3 gap-2 rounded-2xl bg-background p-2 text-center">
       <div className="rounded-xl bg-white px-2 py-3">
@@ -185,7 +221,7 @@ function DreamMetaGrid({ helperName, createdAt, status }: { helperName: string |
         <p className="text-[11px] text-muted-foreground">
           <DreamHelperLabel />
         </p>
-        <p className="mt-1 truncate text-sm font-bold">{helperName ?? <DreamNoHelperLabel />}</p>
+        <p className="mt-1 truncate text-sm font-bold">{helperCount ? `${helperCount}` : helperName ?? <DreamNoHelperLabel />}</p>
       </div>
       <div className="rounded-xl bg-white px-2 py-3">
         <PlayCircle className="mx-auto mb-1 h-4 w-4 text-success" />

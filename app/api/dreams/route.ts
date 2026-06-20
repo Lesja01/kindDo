@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
 
   let dreamsQuery = supabase
     .from("dreams")
-    .select("*, author:users!dreams_author_id_fkey(*)")
+    .select("*, author:users!dreams_author_id_fkey(*), media:dream_media(*)")
     .in("status", ["OPEN", "TAKEN"])
     .eq("visibility", "public")
     .order("created_at", { ascending: false });
@@ -86,6 +86,19 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
+  const mediaUrls = Array.isArray(body.media_urls)
+    ? body.media_urls.filter((url: unknown): url is string => typeof url === "string" && url.trim().length > 0)
+    : [];
+
+  if (mediaUrls.length > 7) {
+    return NextResponse.json({ error: "You can upload up to 7 photos or videos." }, { status: 400 });
+  }
+
+  const primaryMedia = mediaUrls[0] ?? (typeof body.video_url === "string" ? body.video_url : "");
+  if (!primaryMedia) {
+    return NextResponse.json({ error: "Please upload at least one dream photo or video." }, { status: 400 });
+  }
+
   const { data, error } = await supabase
     .from("dreams")
     .insert({
@@ -93,12 +106,15 @@ export async function POST(request: NextRequest) {
       title: body.title,
       description: body.description,
       category: body.category,
-      video_url: body.video_url,
+      video_url: primaryMedia,
       visibility: body.visibility === "private" ? "private" : "public"
     })
     .select("id")
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (mediaUrls.length) {
+    await supabase.from("dream_media").insert(mediaUrls.map((url: string, position: number) => ({ dream_id: data.id, url, position })));
+  }
   return NextResponse.json(data, { status: 201 });
 }

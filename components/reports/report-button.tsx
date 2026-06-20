@@ -56,8 +56,8 @@ export function ReportButton({ targetType, targetId, light = false }: { targetTy
       </Button>
 
       {open ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/35 px-3 pb-4">
-          <form className="w-full max-w-[448px] rounded-3xl bg-white p-4 shadow-2xl shadow-black/20" onSubmit={submit}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/45 px-3 py-4" onClick={() => setOpen(false)}>
+          <form className="w-full max-w-[448px] rounded-3xl bg-white p-4 shadow-2xl shadow-black/20" onSubmit={submit} onClick={(event) => event.stopPropagation()}>
             <div className="flex items-start gap-3">
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-destructive/10 text-destructive">
                 <Flag className="h-5 w-5" />

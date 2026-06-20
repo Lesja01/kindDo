@@ -32,6 +32,7 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
   return (
     <ChatRoom
       chatId={id}
+      dreamId={dream?.id ?? null}
       userId={user.id}
       otherUser={otherUser}
       dreamTitle={task?.text ?? dream?.title ?? null}

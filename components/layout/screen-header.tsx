@@ -9,8 +9,10 @@ export function ScreenHeader({ title }: { title: React.ReactNode }) {
     <div className="sticky top-0 z-30 bg-background/95 px-4 py-4 backdrop-blur">
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1 truncate text-xl font-bold tracking-normal">{title}</div>
-        <Button size="icon" variant="ghost" className="rounded-full" aria-label="Search">
-          <Search className="h-5 w-5" />
+        <Button asChild size="icon" variant="ghost" className="rounded-full" aria-label="Search">
+          <Link href="/search">
+            <Search className="h-5 w-5" />
+          </Link>
         </Button>
         <Button asChild size="icon" variant="ghost" className="rounded-full" aria-label="Notifications">
           <Link href="/notifications">

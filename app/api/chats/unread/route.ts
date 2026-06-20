@@ -16,8 +16,11 @@ export async function GET() {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
+  const { data: hiddenChats } = await supabase.from("chat_hidden_users").select("chat_id").eq("user_id", user.id);
+  const hiddenChatIds = new Set((hiddenChats ?? []).map((item) => item.chat_id));
+
   const counts = await Promise.all(
-    (chats ?? []).map(async (chat) => {
+    (chats ?? []).filter((chat) => !hiddenChatIds.has(chat.id)).map(async (chat) => {
       const { data: read } = await supabase
         .from("chat_reads")
         .select("last_read_at")

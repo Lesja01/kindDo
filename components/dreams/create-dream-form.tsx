@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { VideoUpload } from "@/components/media/video-upload";
+import { MultiMediaUpload } from "@/components/media/multi-media-upload";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { DreamVisibility } from "@/types/database";
@@ -22,7 +22,7 @@ export function CreateDreamForm() {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState(categories[0]);
   const [visibility, setVisibility] = useState<DreamVisibility>("public");
-  const [videoUrl, setVideoUrl] = useState("");
+  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -30,7 +30,7 @@ export function CreateDreamForm() {
     event.preventDefault();
     setError("");
 
-    if (!videoUrl) {
+    if (!mediaUrls.length) {
       setError(t.dreams.uploadRequired);
       return;
     }
@@ -39,7 +39,7 @@ export function CreateDreamForm() {
     const response = await fetch("/api/dreams", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, description, category, video_url: videoUrl, visibility })
+      body: JSON.stringify({ title, description, category, video_url: mediaUrls[0], media_urls: mediaUrls, visibility })
     });
     const payload = await response.json();
     setLoading(false);
@@ -64,7 +64,7 @@ export function CreateDreamForm() {
 
       <div className="space-y-2">
         <Label className="px-1">{t.common.uploadVideo}</Label>
-        <VideoUpload bucket="dream-videos" value={videoUrl} onChange={setVideoUrl} />
+        <MultiMediaUpload bucket="dream-videos" values={mediaUrls} onChange={setMediaUrls} />
       </div>
 
       <div className="rounded-3xl bg-white p-4 shadow-sm shadow-black/5">
