@@ -68,17 +68,17 @@ export function Feed({ viewerId }: { viewerId: string | null }) {
           </Link>
         }
       />
-      <div className="sticky top-[68px] z-20 bg-background/95 px-4 pt-1 backdrop-blur">
-        <TabsList className="grid h-12 w-full grid-cols-2 border-b border-border/70 bg-transparent">
+      <div className="sticky top-[60px] z-20 bg-background/90 px-4 pt-1 backdrop-blur-xl">
+        <TabsList className="grid h-11 w-full grid-cols-2 border-b border-border/70 bg-transparent">
           <TabsTrigger
             value="dreams"
-            className="relative h-12 rounded-none bg-transparent pb-3 pt-2 text-sm font-bold text-muted-foreground shadow-none transition-colors after:absolute after:bottom-0 after:left-4 after:right-4 after:h-0.5 after:rounded-full after:bg-transparent data-[state=active]:text-primary data-[state=active]:after:bg-primary"
+            className="relative h-11 rounded-none bg-transparent pb-3 pt-2 text-sm font-bold text-muted-foreground shadow-none transition-colors after:absolute after:bottom-0 after:left-5 after:right-5 after:h-0.5 after:rounded-full after:bg-transparent data-[state=active]:text-primary data-[state=active]:after:bg-primary"
           >
             {t.common.worldDreams}
           </TabsTrigger>
           <TabsTrigger
             value="stories"
-            className="relative h-12 rounded-none bg-transparent pb-3 pt-2 text-sm font-bold text-muted-foreground shadow-none transition-colors after:absolute after:bottom-0 after:left-4 after:right-4 after:h-0.5 after:rounded-full after:bg-transparent data-[state=active]:text-primary data-[state=active]:after:bg-primary"
+            className="relative h-11 rounded-none bg-transparent pb-3 pt-2 text-sm font-bold text-muted-foreground shadow-none transition-colors after:absolute after:bottom-0 after:left-5 after:right-5 after:h-0.5 after:rounded-full after:bg-transparent data-[state=active]:text-primary data-[state=active]:after:bg-primary"
           >
             {t.nav.stories}
           </TabsTrigger>
@@ -127,12 +127,12 @@ function DreamFilters({ filters, onChange }: { filters: FeedFilters; onChange: (
   }
 
   return (
-    <div className="relative mx-3 mb-1 mt-3">
+    <div className="relative mx-3 mb-1 mt-2">
       <div className="flex min-h-9 items-center gap-2">
         <button
           type="button"
           className={cn(
-            "flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-bold shadow-sm shadow-black/5 transition-colors",
+            "flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-bold shadow-sm shadow-black/5 transition-colors",
             open || activeFilters.length ? "bg-primary text-primary-foreground" : "bg-white text-foreground"
           )}
           onClick={() => setOpen((value) => !value)}
@@ -145,7 +145,7 @@ function DreamFilters({ filters, onChange }: { filters: FeedFilters; onChange: (
         <button
           type="button"
           className={cn(
-            "grid h-9 w-9 shrink-0 place-items-center rounded-full shadow-sm shadow-black/5 transition-colors",
+            "grid h-8 w-8 shrink-0 place-items-center rounded-full shadow-sm shadow-black/5 transition-colors",
             filters.favoritesOnly ? "bg-primary text-primary-foreground" : "bg-white text-muted-foreground"
           )}
           aria-label={t.common.favorites}
@@ -157,19 +157,19 @@ function DreamFilters({ filters, onChange }: { filters: FeedFilters; onChange: (
         <div className="scrollbar-none flex min-w-0 flex-1 gap-1.5 overflow-x-auto">
           {activeFilters.length ? (
             activeFilters.map((filter) => (
-              <span key={filter} className="shrink-0 rounded-full bg-white px-3 py-2 text-xs font-medium text-muted-foreground shadow-sm shadow-black/5">
+              <span key={filter} className="shrink-0 rounded-full bg-white px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-sm shadow-black/5">
                 {filter}
               </span>
             ))
           ) : (
-            <span className="rounded-full bg-white/70 px-3 py-2 text-xs font-medium text-muted-foreground">{t.common.allCategories}</span>
+            <span className="rounded-full bg-white/70 px-3 py-1.5 text-xs font-medium text-muted-foreground">{t.common.allCategories}</span>
           )}
         </div>
 
         {activeFilters.length ? (
           <button
             type="button"
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-muted-foreground shadow-sm shadow-black/5"
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white text-muted-foreground shadow-sm shadow-black/5"
             aria-label={t.common.reset}
             onClick={reset}
           >
@@ -179,7 +179,7 @@ function DreamFilters({ filters, onChange }: { filters: FeedFilters; onChange: (
       </div>
 
       {open ? (
-        <div className="absolute inset-x-0 top-11 z-30 space-y-4 rounded-3xl bg-white p-3 shadow-2xl shadow-black/15 ring-1 ring-black/5">
+        <div className="absolute inset-x-0 top-10 z-30 space-y-4 rounded-[1.75rem] border border-white/80 bg-white p-3 shadow-2xl shadow-black/15 ring-1 ring-black/5">
           <div className="mb-3 flex items-center justify-between gap-3">
             <p className="text-sm font-bold">{t.common.filters}</p>
             <div className="flex items-center gap-1">

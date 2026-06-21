@@ -7,6 +7,7 @@ import { ProfilePhotoGallery } from "@/components/profile/profile-photo-gallery"
 import { ProfileHeaderAvatarUpload } from "@/components/profile/profile-header-avatar-upload";
 import { FeedbackForm } from "@/components/profile/feedback-form";
 import { SignOutButton } from "@/components/profile/sign-out-button";
+import { ThemeSwitcher } from "@/components/profile/theme-switcher";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProfileAboutLabel, PublicProfileButtonLabel, ReputationLabel, StatLabel } from "@/components/profile/profile-copy";
@@ -45,8 +46,8 @@ export default async function MyProfilePage() {
 
   return (
     <section className="min-h-dvh space-y-5 px-4 py-4">
-      <div className="overflow-hidden rounded-3xl bg-white shadow-xl shadow-black/5">
-        <div className="relative h-44 bg-[linear-gradient(135deg,#FF7A59_0%,#FFD2C5_42%,#4ECDC4_100%)]">
+      <div className="overflow-hidden rounded-[1.75rem] border border-white/80 bg-white shadow-[0_16px_40px_rgba(31,41,55,0.08)]">
+        <div className="relative h-44 bg-[linear-gradient(135deg,hsl(var(--primary))_0%,#FFD8CF_44%,hsl(var(--secondary))_100%)]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_20%,rgba(255,255,255,0.55),transparent_28%),radial-gradient(circle_at_86%_20%,rgba(255,255,255,0.35),transparent_24%)]" />
           <Button asChild size="icon" variant="ghost" className="absolute right-3 top-3 rounded-full bg-white/65 backdrop-blur">
             <Link href={`/profile/${user.id}`}>
@@ -66,7 +67,7 @@ export default async function MyProfilePage() {
               </p>
             ) : null}
           </div>
-          <div className="grid grid-cols-3 gap-2 rounded-2xl bg-background p-2">
+          <div className="grid grid-cols-3 gap-2 rounded-2xl bg-background/80 p-2">
             <Stat label={<StatLabel type="dreams" />} value={dreamsCreated ?? 0} />
             <Stat label={<StatLabel type="helped" />} value={dreamsHelped ?? 0} />
             <Stat label={<StatLabel type="stories" />} value={gratitudeStories ?? 0} />
@@ -90,6 +91,7 @@ export default async function MyProfilePage() {
       ) : null}
       <SocialLinksCard links={links ?? []} />
 
+      <ThemeSwitcher />
       <ProfileForm profile={profile} links={links ?? []} />
       <ProfilePhotoGallery userId={user.id} initialPhotos={photos ?? []} />
       <FeedbackForm />
@@ -99,7 +101,7 @@ export default async function MyProfilePage() {
 
 function Stat({ label, value }: { label: React.ReactNode; value: number }) {
   return (
-    <Card className="border-0 bg-white p-3 text-center shadow-none">
+    <Card className="border-0 bg-white p-3 text-center shadow-sm shadow-black/5">
       <p className="text-xl font-extrabold">{value}</p>
       <p className="text-[11px] font-medium text-muted-foreground">{label}</p>
     </Card>
@@ -108,7 +110,7 @@ function Stat({ label, value }: { label: React.ReactNode; value: number }) {
 
 function ProfileInfoCard({ title, children }: { title: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section className="rounded-3xl bg-white p-4 shadow-sm shadow-black/5">
+    <section className="rounded-[1.75rem] border border-white/80 bg-white p-4 shadow-sm shadow-black/5">
       <h2 className="text-sm font-bold uppercase text-muted-foreground">{title}</h2>
       <p className="mt-3 leading-7 text-muted-foreground">{children}</p>
     </section>

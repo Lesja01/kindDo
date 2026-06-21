@@ -18,10 +18,10 @@ export function DreamCard({ dream, viewerId }: { dream: Dream; viewerId?: string
   const primaryMedia = dream.media?.sort((a, b) => a.position - b.position)[0]?.url ?? dream.video_url;
 
   return (
-    <article className="mx-3 my-3 overflow-hidden rounded-3xl bg-white shadow-lg shadow-black/5">
-      <div className="flex items-center gap-3 p-3 pb-2">
+    <article className="mx-3 my-3 overflow-hidden rounded-[1.75rem] border border-white/80 bg-white shadow-[0_12px_34px_rgba(31,41,55,0.07)]">
+      <div className="flex items-center gap-3 px-3 pb-2 pt-3">
         <Link href={`/profile/${dream.author_id}`} className="shrink-0 rounded-full transition-transform active:scale-95" aria-label={dream.author?.name ?? t.common.dreamer}>
-          <Avatar className="h-10 w-10 ring-2 ring-background">
+          <Avatar className="h-9 w-9 ring-2 ring-background">
             <AvatarImage src={dream.author?.avatar ?? undefined} alt={dream.author?.name ?? ""} />
             <AvatarFallback>{initials(dream.author?.name)}</AvatarFallback>
           </Avatar>
@@ -44,12 +44,12 @@ export function DreamCard({ dream, viewerId }: { dream: Dream; viewerId?: string
             )}
           </div>
         </div>
-        <Badge className="rounded-full bg-muted text-muted-foreground">
+        <Badge className="h-7 rounded-full border-0 bg-muted px-2.5 text-[11px] font-bold text-muted-foreground">
           {t.categories[dream.category as keyof typeof t.categories] ?? dream.category}
         </Badge>
       </div>
 
-      <Link href={`/dreams/${dream.id}`} className="relative mx-3 block aspect-[4/3] overflow-hidden rounded-3xl bg-black">
+      <Link href={`/dreams/${dream.id}`} className="relative mx-3 block aspect-[4/3] overflow-hidden rounded-[1.35rem] bg-black">
         <VideoThumbnail src={primaryMedia} className="h-full w-full" />
         {(dream.media?.length ?? 0) > 1 ? (
           <span className="absolute right-3 top-3 rounded-full bg-black/45 px-2 py-1 text-xs font-bold text-white backdrop-blur">{dream.media?.length}</span>
@@ -57,15 +57,15 @@ export function DreamCard({ dream, viewerId }: { dream: Dream; viewerId?: string
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
       </Link>
 
-      <div className="space-y-3 p-4">
+      <div className="space-y-3 px-4 pb-4 pt-3">
         <div className="flex items-start gap-3">
           <div className="min-w-0 flex-1">
-            <h2 className="line-clamp-2 text-xl font-bold tracking-normal">{dream.title}</h2>
+            <h2 className="line-clamp-2 text-lg font-extrabold leading-snug tracking-normal">{dream.title}</h2>
           </div>
           <FavoriteButton dreamId={dream.id} viewerId={viewerId} />
         </div>
         <p className="line-clamp-3 text-sm leading-6 text-muted-foreground">{dream.description}</p>
-        <Button asChild size="lg" className="h-12 w-full rounded-2xl shadow-lg shadow-primary/20">
+        <Button asChild size="lg" className="h-11 w-full rounded-2xl shadow-lg shadow-primary/20">
           <Link href={`/dreams/${dream.id}`}>
             <HeartHandshake className="h-5 w-5" />
             {mine ? t.dreams.myDream : t.dreams.iWillHelp}

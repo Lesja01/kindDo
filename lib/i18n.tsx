@@ -240,7 +240,13 @@ const dictionaries = {
       feedbackContact: "Contact for reply, optional",
       sendFeedback: "Send feedback",
       feedbackSent: "Thank you. Feedback sent.",
-      feedbackError: "Could not send feedback."
+      feedbackError: "Could not send feedback.",
+      themeTitle: "Interface theme",
+      themeIntro: "Choose the mood that feels best for KindDo on this device.",
+      themes: {
+        kinddo: "KindDo warm",
+        ocean: "Ocean calm"
+      }
     },
     statuses: {
       OPEN: "New",
@@ -497,7 +503,13 @@ const dictionaries = {
       feedbackContact: "Контакт для ответа, необязательно",
       sendFeedback: "Отправить отзыв",
       feedbackSent: "Спасибо. Отзыв отправлен.",
-      feedbackError: "Не удалось отправить отзыв."
+      feedbackError: "Не удалось отправить отзыв.",
+      themeTitle: "Тема интерфейса",
+      themeIntro: "Выберите настроение KindDo на этом устройстве.",
+      themes: {
+        kinddo: "KindDo тёплая",
+        ocean: "Океан спокойный"
+      }
     },
     statuses: {
       OPEN: "Новая",

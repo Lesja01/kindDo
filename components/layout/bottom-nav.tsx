@@ -42,8 +42,8 @@ export function BottomNav() {
   const unreadCount = unread.data?.count ?? 0;
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-white/95 px-3 pb-2 pt-1 backdrop-blur">
-      <div className="mx-auto grid h-14 max-w-[480px] grid-cols-5">
+    <nav className="fixed inset-x-0 bottom-0 z-40 bg-transparent px-3 pb-3 pt-1">
+      <div className="mx-auto grid h-16 max-w-[480px] grid-cols-5 rounded-[1.75rem] border border-white/80 bg-white/95 px-1 shadow-2xl shadow-black/10 backdrop-blur">
         {items.map((item) => {
           const Icon = item.icon;
           const isProfileItem = item.href === "/profile";
@@ -55,18 +55,18 @@ export function BottomNav() {
               key={item.href}
               href={href}
               className={cn(
-                "relative flex flex-col items-center justify-center gap-1 rounded-2xl text-[11px] font-semibold text-muted-foreground transition-colors",
+                "relative flex flex-col items-center justify-center gap-0.5 rounded-2xl text-[10px] font-semibold text-muted-foreground transition-colors",
                 active && "text-primary"
               )}
             >
               <span
                 className={cn(
-                  "relative grid h-7 w-10 place-items-center rounded-full transition-colors",
+                  "relative grid h-8 w-10 place-items-center rounded-full transition-colors",
                   active && "bg-primary/10",
                   item.href === "/my-dreams" && !active && "bg-secondary/10 text-secondary"
                 )}
               >
-                <Icon className="h-5 w-5" aria-hidden />
+                <Icon className={cn("h-5 w-5", active && "fill-primary/10")} aria-hidden />
                 {item.href === "/chats" && unreadCount > 0 ? (
                   <span className="absolute right-1 top-0 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-destructive px-1 text-[9px] font-bold leading-none text-destructive-foreground ring-2 ring-white">
                     {unreadCount > 9 ? "9+" : unreadCount}
