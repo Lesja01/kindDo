@@ -12,11 +12,19 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const { id } = await params;
   const body = await request.json();
   const updates: Record<string, string> = {};
+  const mediaUrls: string[] | null = Array.isArray(body.media_urls)
+    ? body.media_urls.filter((url: unknown): url is string => typeof url === "string" && url.trim().length > 0)
+    : null;
 
   if (typeof body.title === "string") updates.title = body.title.trim();
   if (typeof body.description === "string") updates.description = body.description.trim();
   if (typeof body.category === "string") updates.category = body.category;
   if (body.visibility === "public" || body.visibility === "private") updates.visibility = body.visibility;
+  if (mediaUrls) {
+    if (mediaUrls.length > 7) return NextResponse.json({ error: "You can upload up to 7 photos or videos." }, { status: 400 });
+    if (!mediaUrls.length) return NextResponse.json({ error: "Please upload at least one dream photo or video." }, { status: 400 });
+    updates.video_url = mediaUrls[0];
+  }
 
   if ("title" in updates && !updates.title) return NextResponse.json({ error: "Title is required" }, { status: 400 });
   if ("description" in updates && !updates.description) return NextResponse.json({ error: "Description is required" }, { status: 400 });
@@ -27,10 +35,21 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     .update(updates)
     .eq("id", id)
     .eq("author_id", user.id)
-    .select("id,title,description,category,visibility")
+    .select("id,title,description,category,visibility,video_url")
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+
+  if (mediaUrls) {
+    const { error: deleteMediaError } = await supabase.from("dream_media").delete().eq("dream_id", id);
+    if (deleteMediaError) return NextResponse.json({ error: deleteMediaError.message }, { status: 400 });
+
+    const { error: insertMediaError } = await supabase
+      .from("dream_media")
+      .insert(mediaUrls.map((url, position) => ({ dream_id: id, url, position })));
+    if (insertMediaError) return NextResponse.json({ error: insertMediaError.message }, { status: 400 });
+  }
+
   return NextResponse.json(data);
 }
 

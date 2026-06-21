@@ -1,8 +1,10 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { Eye, EyeOff, Pencil } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff, Images, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MultiMediaUpload } from "@/components/media/multi-media-upload";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { Dream, DreamVisibility } from "@/types/database";
@@ -15,6 +17,7 @@ export function DreamDetailEditor({
   initialDescription,
   initialCategory,
   initialVisibility,
+  initialMediaUrls,
   canEdit
 }: {
   dreamId: string;
@@ -22,14 +25,17 @@ export function DreamDetailEditor({
   initialDescription: string;
   initialCategory: string;
   initialVisibility: DreamVisibility;
+  initialMediaUrls: string[];
   canEdit: boolean;
 }) {
+  const router = useRouter();
   const { t } = useI18n();
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
   const [category, setCategory] = useState(initialCategory);
   const [visibility, setVisibility] = useState<DreamVisibility>(initialVisibility);
-  const [editing, setEditing] = useState<"title" | "description" | "category" | null>(null);
+  const [mediaUrls, setMediaUrls] = useState(initialMediaUrls);
+  const [editing, setEditing] = useState<"title" | "description" | "category" | "media" | null>(null);
   const [message, setMessage] = useState("");
   const isPublic = visibility === "public";
 
@@ -49,6 +55,30 @@ export function DreamDetailEditor({
     }
 
     setEditing(null);
+    router.refresh();
+  }
+
+  async function saveMedia() {
+    setMessage("");
+    if (!mediaUrls.length) {
+      setMessage(t.dreams.uploadRequired);
+      return;
+    }
+
+    const response = await fetch(`/api/dreams/${dreamId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ media_urls: mediaUrls })
+    });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      setMessage(payload?.error ?? t.dreams.taskSaveError);
+      return;
+    }
+
+    setEditing(null);
+    router.refresh();
   }
 
   async function toggleVisibility() {
@@ -93,6 +123,23 @@ export function DreamDetailEditor({
               {isPublic ? t.profile.publishedShort : t.profile.hiddenShort}
             </button>
           </>
+          <button
+            type="button"
+            className="inline-flex h-8 items-center gap-1 rounded-full bg-background px-3 text-xs font-bold text-muted-foreground"
+            onClick={() => setEditing((value) => (value === "media" ? null : "media"))}
+          >
+            <Images className="h-3.5 w-3.5" />
+            {t.dreams.editMedia}
+          </button>
+        </div>
+      ) : null}
+
+      {canEdit && editing === "media" ? (
+        <div className="rounded-3xl bg-background p-2">
+          <MultiMediaUpload bucket="dream-videos" values={mediaUrls} onChange={setMediaUrls} />
+          <Button type="button" className="mt-2 h-11 w-full rounded-2xl" onClick={saveMedia}>
+            {t.dreams.saveMedia}
+          </Button>
         </div>
       ) : null}
 

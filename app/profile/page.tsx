@@ -6,6 +6,7 @@ import { ProfileForm } from "@/components/profile/profile-form";
 import { ProfilePhotoGallery } from "@/components/profile/profile-photo-gallery";
 import { ProfileHeaderAvatarUpload } from "@/components/profile/profile-header-avatar-upload";
 import { FeedbackForm } from "@/components/profile/feedback-form";
+import { LanguageSwitcher } from "@/components/profile/language-switcher";
 import { SignOutButton } from "@/components/profile/sign-out-button";
 import { ThemeSwitcher } from "@/components/profile/theme-switcher";
 import { Button } from "@/components/ui/button";
@@ -91,6 +92,7 @@ export default async function MyProfilePage() {
       <SocialLinksCard links={links ?? []} />
 
       <ThemeSwitcher />
+      <LanguageSwitcher />
       <ProfileForm profile={profile} links={links ?? []} />
       <ProfilePhotoGallery userId={user.id} initialPhotos={photos ?? []} />
       <FeedbackForm />

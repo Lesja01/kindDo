@@ -2,7 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Check, Eye, EyeOff, GripVertical, Grid3X3, List, Plus, Search, Trash2 } from "lucide-react";
+import { ArrowLeft, Check, Eye, EyeOff, GripVertical, Grid3X3, List, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -283,6 +283,7 @@ function DreamGridCard({
 function DreamTasks({ dreamId, tasks, onChange }: { dreamId: string; tasks: DreamTask[]; onChange: (tasks: DreamTask[]) => void }) {
   const { t } = useI18n();
   const [text, setText] = useState("");
+  const [editingTask, setEditingTask] = useState<{ id: string; text: string } | null>(null);
   const [error, setError] = useState("");
 
   async function addTask(event: FormEvent) {
@@ -339,6 +340,31 @@ function DreamTasks({ dreamId, tasks, onChange }: { dreamId: string; tasks: Drea
     }
   }
 
+  async function saveTaskText(event: FormEvent) {
+    event.preventDefault();
+    if (!editingTask) return;
+    const value = editingTask.text.trim();
+    if (!value) return;
+
+    setError("");
+    const previous = tasks;
+    onChange(tasks.map((item) => (item.id === editingTask.id ? { ...item, text: value } : item)));
+    const response = await fetch(`/api/dreams/${dreamId}/tasks/${editingTask.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: value })
+    });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      setError(payload?.error ?? t.dreams.taskSaveError);
+      onChange(previous);
+      return;
+    }
+
+    setEditingTask(null);
+  }
+
   return (
     <div className="mt-2 rounded-2xl bg-background p-2">
       <p className="px-1 text-xs font-bold uppercase text-muted-foreground">{t.dreams.tasks}</p>
@@ -359,7 +385,24 @@ function DreamTasks({ dreamId, tasks, onChange }: { dreamId: string; tasks: Drea
                 {task.completed ? <Check className="h-3.5 w-3.5" /> : null}
               </button>
               <div className="min-w-0 flex-1">
-                <p className={cn("truncate text-xs font-medium", task.completed && "text-muted-foreground line-through")}>{task.text}</p>
+                {editingTask?.id === task.id ? (
+                  <form className="flex gap-1" onSubmit={saveTaskText}>
+                    <input
+                      className="h-8 min-w-0 flex-1 rounded-xl border-0 bg-background px-2 text-xs font-medium outline-none ring-1 ring-border/70"
+                      value={editingTask.text}
+                      onChange={(event) => setEditingTask({ id: task.id, text: event.target.value })}
+                      autoFocus
+                    />
+                    <button type="button" className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-muted" onClick={() => setEditingTask(null)}>
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                    <button className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
+                      <Check className="h-3.5 w-3.5" />
+                    </button>
+                  </form>
+                ) : (
+                  <p className={cn("truncate text-xs font-medium", task.completed && "text-muted-foreground line-through")}>{task.text}</p>
+                )}
                 {task.helper ? (
                   <p className="truncate text-[11px] font-semibold text-primary">
                     {t.dreams.taskTakenBy} {(Array.isArray(task.helper) ? task.helper[0]?.name : task.helper.name) ?? t.common.helper}
@@ -368,6 +411,17 @@ function DreamTasks({ dreamId, tasks, onChange }: { dreamId: string; tasks: Drea
                 {task.completed && !task.helper_id ? <p className="truncate text-[11px] font-semibold text-success">{t.dreams.taskCompletedByAuthor}</p> : null}
               </div>
               {task.status === "TAKEN" && !task.completed ? <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">{t.statuses.TAKEN}</span> : null}
+              {!task.helper_id && task.status === "OPEN" ? (
+                <button
+                  type="button"
+                  className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+                  onClick={() => setEditingTask({ id: task.id, text: task.text })}
+                  aria-label={t.dreams.editTask}
+                  title={t.dreams.editTask}
+                >
+                  <Pencil className="h-4 w-4" />
+                </button>
+              ) : null}
               <button
                 type="button"
                 className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"

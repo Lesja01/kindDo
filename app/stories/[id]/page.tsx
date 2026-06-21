@@ -7,7 +7,7 @@ import { MediaViewer } from "@/components/media/media-viewer";
 import { ReportButton } from "@/components/reports/report-button";
 import { DreamerFallback } from "@/components/dreams/dream-detail-copy";
 import { StoryDreamTitleFallback, StoryHelperLine, ViewOriginalDreamLabel } from "@/components/stories/story-detail-copy";
-import { isImageUrl } from "@/lib/media";
+import { isVideoUrl } from "@/lib/media";
 import { createClient } from "@/lib/supabase/server";
 import { initials, timeAgo } from "@/lib/utils";
 
@@ -21,7 +21,7 @@ export default async function StoryDetailPage({ params }: { params: Promise<{ id
     .single();
 
   if (!story) notFound();
-  const isImage = isImageUrl(story.video_url);
+  const isVideo = isVideoUrl(story.video_url);
 
   return (
     <article className="min-h-dvh">
@@ -39,7 +39,7 @@ export default async function StoryDetailPage({ params }: { params: Promise<{ id
           <ReportButton targetType="story" targetId={story.id} light />
         </div>
 
-        {!isImage ? (
+        {isVideo ? (
           <div className="pointer-events-none absolute inset-0 grid place-items-center">
             <span className="grid h-16 w-16 place-items-center rounded-full bg-black/35 text-white backdrop-blur-md">
               <PlayCircle className="h-9 w-9 fill-white/20" />

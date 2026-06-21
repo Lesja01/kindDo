@@ -2,7 +2,7 @@
 
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, Contact, Image as ImageIcon, Loader2, MapPin, MoreHorizontal, Pencil, Send, Trash2, X } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Contact, Image as ImageIcon, Loader2, MapPin, MessageCircleReply, MoreHorizontal, Pencil, Send, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -45,10 +45,13 @@ export function ChatRoom({
   const [menuOpen, setMenuOpen] = useState(false);
   const [deletingChat, setDeletingChat] = useState(false);
   const [editingMessage, setEditingMessage] = useState<{ id: string; text: string } | null>(null);
+  const [actionMessage, setActionMessage] = useState<Message | null>(null);
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const [savingEdit, setSavingEdit] = useState(false);
   const [selected, setSelected] = useState(helperSelected);
   const bottomRef = useRef<HTMLDivElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const messages = useQuery({
     queryKey: ["messages", chatId],
@@ -107,10 +110,21 @@ export function ChatRoom({
     attachment_payload?: Record<string, unknown>;
   }) {
     setAttachmentError("");
+    const payloadWithReply = replyingTo
+      ? {
+          ...payload,
+          attachment_payload: {
+            ...(payload.attachment_payload ?? {}),
+            reply_to: replyingTo.id,
+            reply_text: getMessagePreview(replyingTo, t),
+            reply_sender_name: replyingTo.sender_id === userId ? t.common.you : replyingTo.sender?.name ?? otherUser?.name ?? t.common.dreamer
+          }
+        }
+      : payload;
     const response = await fetch(`/api/chats/${chatId}/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payloadWithReply)
     });
 
     if (!response.ok) {
@@ -124,6 +138,7 @@ export function ChatRoom({
       return [...current, message];
     });
     queryClient.invalidateQueries({ queryKey: ["chats", "unread"] });
+    setReplyingTo(null);
     return true;
   }
 
@@ -275,6 +290,32 @@ export function ChatRoom({
     setEditingMessage(null);
   }
 
+  function startMessagePress(message: Message, mine: boolean) {
+    if (message.kind !== "user") return;
+    if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+    longPressTimerRef.current = setTimeout(() => {
+      setActionMessage(message);
+      if (mine) navigator.vibrate?.(12);
+    }, 450);
+  }
+
+  function cancelMessagePress() {
+    if (!longPressTimerRef.current) return;
+    clearTimeout(longPressTimerRef.current);
+    longPressTimerRef.current = null;
+  }
+
+  async function copyMessageText() {
+    if (!actionMessage?.text) return;
+    await navigator.clipboard?.writeText(actionMessage.text).catch(() => null);
+    setActionMessage(null);
+  }
+
+  function replyToMessage(message: Message) {
+    setReplyingTo(message);
+    setActionMessage(null);
+  }
+
   return (
     <div className="flex min-h-dvh flex-col bg-background">
       <div className="sticky top-0 z-20 grid grid-cols-[40px_1fr_40px] items-center gap-2 bg-background/95 px-4 py-3 backdrop-blur">
@@ -413,6 +454,15 @@ export function ChatRoom({
                     "relative rounded-3xl px-4 py-2.5 text-sm shadow-sm",
                     mine ? "rounded-br-md bg-primary text-primary-foreground" : "rounded-bl-md bg-white"
                   )}
+                  onPointerDown={() => startMessagePress(message, mine)}
+                  onPointerUp={cancelMessagePress}
+                  onPointerCancel={cancelMessagePress}
+                  onPointerLeave={cancelMessagePress}
+                  onContextMenu={(event) => {
+                    if (message.kind !== "user") return;
+                    event.preventDefault();
+                    setActionMessage(message);
+                  }}
                 >
                   {editingMessage?.id === message.id ? (
                     <form className="space-y-2" onSubmit={saveMessageEdit}>
@@ -505,7 +555,52 @@ export function ChatRoom({
         </div>
       ) : null}
       {attachmentError ? <p className="mx-5 mb-2 text-xs text-destructive">{attachmentError}</p> : null}
-      <form onSubmit={send} className="sticky bottom-20 mx-3 mb-2 flex gap-1.5 rounded-[1.75rem] bg-white/95 p-2 shadow-xl shadow-black/10 backdrop-blur">
+      {actionMessage ? (
+        <div className="fixed inset-0 z-50 flex items-end bg-black/35 p-3" onClick={() => setActionMessage(null)}>
+          <div className="w-full max-w-[452px] rounded-3xl bg-white p-2 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            {actionMessage.text ? (
+              <button type="button" className="w-full rounded-2xl px-4 py-3 text-left text-sm font-bold hover:bg-background" onClick={copyMessageText}>
+                {t.chats.copyMessage}
+              </button>
+            ) : null}
+            <button type="button" className="flex w-full items-center gap-2 rounded-2xl px-4 py-3 text-left text-sm font-bold hover:bg-background" onClick={() => replyToMessage(actionMessage)}>
+              <MessageCircleReply className="h-4 w-4" />
+              {t.chats.replyMessage}
+            </button>
+            {actionMessage.sender_id === userId && actionMessage.kind === "user" && actionMessage.text ? (
+              <button
+                type="button"
+                className="w-full rounded-2xl px-4 py-3 text-left text-sm font-bold hover:bg-background"
+                onClick={() => {
+                  setEditingMessage({ id: actionMessage.id, text: actionMessage.text });
+                  setActionMessage(null);
+                }}
+              >
+                {t.chats.editMessage}
+              </button>
+            ) : null}
+            <button type="button" className="w-full rounded-2xl px-4 py-3 text-left text-sm font-bold text-muted-foreground hover:bg-background" onClick={() => setActionMessage(null)}>
+              {t.common.close}
+            </button>
+          </div>
+        </div>
+      ) : null}
+      <form onSubmit={send} className="sticky bottom-20 mx-3 mb-2 space-y-2 rounded-[1.75rem] bg-white/95 p-2 shadow-xl shadow-black/10 backdrop-blur">
+        {replyingTo ? (
+          <div className="flex items-start gap-2 rounded-2xl bg-background px-3 py-2">
+            <div className="mt-0.5 h-9 w-1 rounded-full bg-primary" />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs font-bold text-primary">
+                {replyingTo.sender_id === userId ? t.common.you : replyingTo.sender?.name ?? otherUser?.name ?? t.common.dreamer}
+              </p>
+              <p className="truncate text-xs text-muted-foreground">{getMessagePreview(replyingTo, t)}</p>
+            </div>
+            <button type="button" className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-muted-foreground" onClick={() => setReplyingTo(null)} aria-label={t.common.close}>
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        ) : null}
+        <div className="flex gap-1.5">
         <button
           type="button"
           className="grid h-11 w-9 shrink-0 place-items-center rounded-full text-muted-foreground"
@@ -531,6 +626,7 @@ export function ChatRoom({
         <Button size="icon" className="h-11 w-11 rounded-full" aria-label={t.chats.send}>
           <Send className="h-4 w-4" />
         </Button>
+        </div>
       </form>
     </div>
   );
@@ -538,10 +634,12 @@ export function ChatRoom({
 
 function MessageContent({ message }: { message: Message }) {
   const { t } = useI18n();
+  const reply = getReplyPayload(message.attachment_payload);
 
   if (message.attachment_type === "image" && message.attachment_url) {
     return (
       <div className="space-y-2">
+        {reply ? <ReplyQuote reply={reply} /> : null}
         <div className="max-h-72 overflow-hidden rounded-2xl bg-black">
           <MediaViewer src={message.attachment_url} className="h-full max-h-72 w-full object-cover" />
         </div>
@@ -553,6 +651,7 @@ function MessageContent({ message }: { message: Message }) {
   if (message.attachment_type === "contact") {
     return (
       <div className="space-y-1">
+        {reply ? <ReplyQuote reply={reply} /> : null}
         <p className="text-xs font-bold opacity-75">{t.chats.contactShared}</p>
         <p className="leading-6">{message.text || String(message.attachment_payload?.contact ?? "")}</p>
       </div>
@@ -566,6 +665,7 @@ function MessageContent({ message }: { message: Message }) {
     const href = hasCoordinates ? `https://maps.google.com/?q=${lat},${lng}` : null;
     return (
       <div className="space-y-2">
+        {reply ? <ReplyQuote reply={reply} /> : null}
         <p className="text-xs font-bold opacity-75">{t.chats.locationShared}</p>
         {href && hasCoordinates ? (
           <a href={href} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-2xl bg-white/20 px-3 py-2 font-bold underline-offset-2 hover:underline">
@@ -579,7 +679,37 @@ function MessageContent({ message }: { message: Message }) {
     );
   }
 
-  return <p className="leading-6">{message.text}</p>;
+  return (
+    <div className="space-y-2">
+      {reply ? <ReplyQuote reply={reply} /> : null}
+      <p className="leading-6">{message.text}</p>
+    </div>
+  );
+}
+
+function ReplyQuote({ reply }: { reply: { senderName: string; text: string } }) {
+  return (
+    <div className="rounded-2xl border-l-4 border-current bg-white/20 px-3 py-2">
+      <p className="truncate text-xs font-bold opacity-85">{reply.senderName}</p>
+      <p className="line-clamp-2 text-xs opacity-75">{reply.text}</p>
+    </div>
+  );
+}
+
+function getReplyPayload(payload: Record<string, unknown> | null) {
+  if (!payload) return null;
+  const text = typeof payload.reply_text === "string" ? payload.reply_text : "";
+  const senderName = typeof payload.reply_sender_name === "string" ? payload.reply_sender_name : "";
+  if (!text) return null;
+  return { text, senderName };
+}
+
+function getMessagePreview(message: Message, t: ReturnType<typeof useI18n>["t"]) {
+  if (message.text) return message.text;
+  if (message.attachment_type === "image") return t.chats.photoMessage;
+  if (message.attachment_type === "contact") return t.chats.contactShared;
+  if (message.attachment_type === "location") return t.chats.locationShared;
+  return t.common.message;
 }
 
 function parseTaskThanks(value: string) {

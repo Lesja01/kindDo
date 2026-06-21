@@ -2,11 +2,12 @@
 
 import { ChangeEvent, useState } from "react";
 import { PlayCircle, Upload, X } from "lucide-react";
-import { isImageUrl } from "@/lib/media";
+import { isVideoUrl } from "@/lib/media";
 import { useI18n } from "@/lib/i18n";
 import { createClient } from "@/lib/supabase/client";
 
 type Bucket = "dream-videos" | "story-videos" | "avatars";
+const mediaAccept = "image/*,video/*";
 
 export function VideoUpload({
   bucket,
@@ -52,9 +53,7 @@ export function VideoUpload({
         <div className="relative aspect-[4/3] bg-muted">
           {value ? (
             <>
-              {isImageUrl(value) ? (
-                <img className="h-full w-full object-cover" src={value} alt="" />
-              ) : (
+              {isVideoUrl(value) ? (
                 <>
                   <video className="h-full w-full object-cover" src={value} controls playsInline />
                   <div className="pointer-events-none absolute inset-0 grid place-items-center">
@@ -63,6 +62,8 @@ export function VideoUpload({
                     </span>
                   </div>
                 </>
+              ) : (
+                <img className="h-full w-full object-cover" src={value} alt="" />
               )}
               <button
                 type="button"
@@ -79,14 +80,14 @@ export function VideoUpload({
                 <Upload className="h-6 w-6 text-primary" />
               </span>
               <span className="text-sm font-semibold">{uploading ? t.common.uploading : t.common.uploadVideo}</span>
-              <input className="sr-only" type="file" accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,video/quicktime" onChange={handleFile} />
+              <input className="sr-only" type="file" accept={mediaAccept} onChange={handleFile} />
             </label>
           )}
         </div>
         <label className="flex h-11 cursor-pointer items-center justify-center gap-2 border-t text-sm font-semibold text-foreground">
           <Upload className="h-4 w-4" />
           {uploading ? t.common.uploading : t.common.uploadVideo}
-          <input className="sr-only" type="file" accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,video/quicktime" onChange={handleFile} disabled={uploading} />
+          <input className="sr-only" type="file" accept={mediaAccept} onChange={handleFile} disabled={uploading} />
         </label>
       </div>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}

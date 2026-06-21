@@ -2,7 +2,8 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { Check, Plus, Trash2 } from "lucide-react";
+import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TaskHelpButton } from "@/components/dreams/task-help-button";
 import { useI18n } from "@/lib/i18n";
@@ -31,6 +32,7 @@ export function DreamDetailTasks({
   const { t } = useI18n();
   const [tasks, setTasks] = useState(initialTasks);
   const [text, setText] = useState("");
+  const [editingTask, setEditingTask] = useState<{ id: string; text: string } | null>(null);
   const [error, setError] = useState("");
 
   async function addTask(event: FormEvent) {
@@ -91,12 +93,39 @@ export function DreamDetailTasks({
     }
   }
 
+  async function saveTaskText(event: FormEvent) {
+    event.preventDefault();
+    if (!editingTask) return;
+
+    const value = editingTask.text.trim();
+    if (!value) return;
+
+    setError("");
+    const previous = tasks;
+    setTasks((current) => current.map((item) => (item.id === editingTask.id ? { ...item, text: value } : item)));
+    const response = await fetch(`/api/dreams/${dreamId}/tasks/${editingTask.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: value })
+    });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      setError(payload?.error ?? t.dreams.taskSaveError);
+      setTasks(previous);
+      return;
+    }
+
+    setEditingTask(null);
+  }
+
   return (
     <div className="mt-4 rounded-2xl bg-background p-2">
       <div className="space-y-2">
         {tasks.map((task) => {
           const helper = Array.isArray(task.helper) ? task.helper[0] : task.helper;
           const canHelp = !isAuthor && userId && task.status === "OPEN" && !task.helper_id;
+          const canEditText = isAuthor && !task.helper_id && task.status === "OPEN";
           const taskCandidates = candidates.filter((candidate) => candidate.task_id === task.id && candidate.candidate);
 
           return (
@@ -118,19 +147,48 @@ export function DreamDetailTasks({
                   <span className={task.completed ? "mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-success text-success-foreground" : "mt-0.5 h-6 w-6 shrink-0 rounded-full border border-muted-foreground/30"} />
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className={cn("text-sm font-semibold leading-5", task.completed && "text-muted-foreground line-through")}>{task.text}</p>
+                  {editingTask?.id === task.id ? (
+                    <form className="flex gap-1" onSubmit={saveTaskText}>
+                      <input
+                        className="h-9 min-w-0 flex-1 rounded-xl border-0 bg-background px-3 text-sm font-semibold outline-none ring-1 ring-border/70"
+                        value={editingTask.text}
+                        onChange={(event) => setEditingTask({ id: task.id, text: event.target.value })}
+                        autoFocus
+                      />
+                      <Button type="button" size="icon" variant="ghost" className="h-9 w-9 rounded-full" onClick={() => setEditingTask(null)}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                      <Button size="icon" className="h-9 w-9 rounded-full">
+                        <Check className="h-4 w-4" />
+                      </Button>
+                    </form>
+                  ) : (
+                    <p className={cn("text-sm font-semibold leading-5", task.completed && "text-muted-foreground line-through")}>{task.text}</p>
+                  )}
                   {helper ? <p className="mt-1 text-xs font-semibold text-primary">{helper.name}</p> : null}
                   {task.completed && !task.helper_id ? <p className="mt-1 text-xs font-semibold text-success">{t.dreams.taskCompletedByAuthor}</p> : null}
                 </div>
                 {isAuthor ? (
-                  <button
-                    type="button"
-                    className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                    onClick={() => deleteTask(task)}
-                    aria-label={t.dreams.deleteTask}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                  <div className="flex shrink-0 gap-1">
+                    {canEditText ? (
+                      <button
+                        type="button"
+                        className="grid h-8 w-8 place-items-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+                        onClick={() => setEditingTask({ id: task.id, text: task.text })}
+                        aria-label={t.dreams.editTask}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      className="grid h-8 w-8 place-items-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => deleteTask(task)}
+                      aria-label={t.dreams.deleteTask}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 ) : null}
               </div>
 

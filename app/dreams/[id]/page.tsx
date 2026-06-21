@@ -120,6 +120,7 @@ export default async function DreamDetailPage({ params }: { params: Promise<{ id
             initialDescription={dream.description}
             initialCategory={dream.category}
             initialVisibility={dream.visibility}
+            initialMediaUrls={dreamMediaUrls}
             canEdit={isAuthor}
           />
           <DreamMetaGrid helperName={dream.helper?.name ?? null} helperCount={taskHelpers.length} createdAt={dream.created_at} status={dream.status} />

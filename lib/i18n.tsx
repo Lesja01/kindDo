@@ -45,6 +45,7 @@ const dictionaries = {
       loading: "Loading...",
       uploading: "Uploading...",
       uploadVideo: "Upload photo or video",
+      captureMedia: "Take photo/video",
       mediaLimit: "You can upload up to 7 photos or videos.",
       favorites: "Favorites",
       close: "Close",
@@ -121,7 +122,10 @@ const dictionaries = {
       noHelperYet: "No one yet",
       responded: "Responded",
       addChecklistItem: "Add checklist item",
-      markDone: "Mark done"
+      markDone: "Mark done",
+      editMedia: "Edit media",
+      saveMedia: "Save media",
+      editTask: "Edit task"
     },
     stories: {
       title: "Kind stories",
@@ -196,6 +200,9 @@ const dictionaries = {
       chatDeleted: "Chat hidden.",
       editMessage: "Edit message",
       edited: "edited",
+      copyMessage: "Copy message",
+      replyMessage: "Reply",
+      photoMessage: "Photo",
       attachPhoto: "Attach photo",
       shareContact: "Share contact",
       shareLocation: "Share location",
@@ -257,6 +264,8 @@ const dictionaries = {
       feedbackError: "Could not send feedback.",
       themeTitle: "Interface theme",
       themeIntro: "Choose the mood that feels best for KindDo on this device.",
+      languageTitle: "Language",
+      languageIntro: "Choose app language.",
       themes: {
         kinddo: "KindDo warm",
         ocean: "Ocean calm"
@@ -323,6 +332,7 @@ const dictionaries = {
       loading: "Загружаем...",
       uploading: "Загружаем...",
       uploadVideo: "Загрузить фото или видео",
+      captureMedia: "Снять фото/видео",
       mediaLimit: "Можно загрузить до 7 фото или видео.",
       favorites: "Избранное",
       close: "Закрыть",
@@ -399,7 +409,10 @@ const dictionaries = {
       noHelperYet: "Ещё никто",
       responded: "Откликнулись",
       addChecklistItem: "Добавить пункт",
-      markDone: "Отметить выполненным"
+      markDone: "Отметить выполненным",
+      editMedia: "Фото и видео",
+      saveMedia: "Сохранить фото и видео",
+      editTask: "Редактировать пункт"
     },
     stories: {
       title: "Истории добрых дел",
@@ -474,6 +487,9 @@ const dictionaries = {
       chatDeleted: "Чат скрыт.",
       editMessage: "Редактировать сообщение",
       edited: "изменено",
+      copyMessage: "Скопировать сообщение",
+      replyMessage: "Ответить",
+      photoMessage: "Фото",
       attachPhoto: "Прикрепить фото",
       shareContact: "Отправить контакт",
       shareLocation: "Отправить геопозицию",
@@ -535,6 +551,8 @@ const dictionaries = {
       feedbackError: "Не удалось отправить отзыв.",
       themeTitle: "Тема интерфейса",
       themeIntro: "Выберите настроение KindDo на этом устройстве.",
+      languageTitle: "Язык",
+      languageIntro: "Выберите язык приложения.",
       themes: {
         kinddo: "KindDo тёплая",
         ocean: "Океан спокойный"

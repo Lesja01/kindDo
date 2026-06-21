@@ -1,13 +1,14 @@
 "use client";
 
 import { ChangeEvent, useState } from "react";
-import { PlayCircle, Upload, X } from "lucide-react";
-import { isImageUrl } from "@/lib/media";
+import { Camera, PlayCircle, Upload, X } from "lucide-react";
+import { isImageUrl, isVideoUrl } from "@/lib/media";
 import { useI18n } from "@/lib/i18n";
 import { createClient } from "@/lib/supabase/client";
 
 type Bucket = "dream-videos" | "story-videos" | "avatars";
 const MAX_MEDIA_FILES = 7;
+const mediaAccept = "image/*,video/*";
 
 export function MultiMediaUpload({
   bucket,
@@ -77,7 +78,7 @@ export function MultiMediaUpload({
           <div className="grid grid-cols-2 gap-2">
             {values.map((url, index) => (
               <div key={`${url}-${index}`} className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted">
-                {isImageUrl(url) ? (
+                {!isVideoUrl(url) || isImageUrl(url) ? (
                   <img className="h-full w-full object-cover" src={url} alt="" />
                 ) : (
                   <>
@@ -104,14 +105,28 @@ export function MultiMediaUpload({
               <Upload className="h-6 w-6 text-primary" />
             </span>
             <span className="text-sm font-semibold">{uploading ? t.common.uploading : t.common.uploadVideo}</span>
-            <input className="sr-only" type="file" multiple accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,video/quicktime" onChange={handleFiles} disabled={uploading} />
+            <input className="sr-only" type="file" multiple accept={mediaAccept} onChange={handleFiles} disabled={uploading} />
           </label>
         )}
         {values.length > 0 && values.length < MAX_MEDIA_FILES ? (
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <label className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-2xl border text-sm font-semibold text-foreground">
+              <Upload className="h-4 w-4" />
+              {uploading ? t.common.uploading : t.common.uploadVideo}
+              <input className="sr-only" type="file" multiple accept={mediaAccept} onChange={handleFiles} disabled={uploading} />
+            </label>
+            <label className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-2xl border text-sm font-semibold text-foreground">
+              <Camera className="h-4 w-4" />
+              {t.common.captureMedia}
+              <input className="sr-only" type="file" accept={mediaAccept} capture="environment" onChange={handleFiles} disabled={uploading} />
+            </label>
+          </div>
+        ) : null}
+        {!values.length ? (
           <label className="mt-2 flex h-11 cursor-pointer items-center justify-center gap-2 rounded-2xl border text-sm font-semibold text-foreground">
-            <Upload className="h-4 w-4" />
-            {uploading ? t.common.uploading : t.common.uploadVideo}
-            <input className="sr-only" type="file" multiple accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,video/quicktime" onChange={handleFiles} disabled={uploading} />
+            <Camera className="h-4 w-4" />
+            {t.common.captureMedia}
+            <input className="sr-only" type="file" accept={mediaAccept} capture="environment" onChange={handleFiles} disabled={uploading} />
           </label>
         ) : null}
       </div>

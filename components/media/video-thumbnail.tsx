@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { isImageUrl } from "@/lib/media";
+import { isVideoUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
 
 export function VideoThumbnail({ src, className }: { src: string; className?: string }) {
@@ -9,7 +9,7 @@ export function VideoThumbnail({ src, className }: { src: string; className?: st
   const [loaded, setLoaded] = useState(false);
   const thumbnailSrc = src.includes("#t=") ? src : `${src}#t=0.1`;
 
-  if (isImageUrl(src)) {
+  if (!isVideoUrl(src)) {
     return (
       <div className={cn("relative overflow-hidden bg-muted", className)}>
         <img className="h-full w-full object-cover" src={src} alt="" />
