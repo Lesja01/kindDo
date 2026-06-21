@@ -10,19 +10,21 @@ const ThemeContext = createContext<{
   theme: AppTheme;
   setTheme: (theme: AppTheme) => void;
 }>({
-  theme: "kinddo",
+  theme: "ocean",
   setTheme: () => {}
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<AppTheme>("kinddo");
+  const [theme, setThemeState] = useState<AppTheme>("ocean");
 
   useEffect(() => {
     const saved = window.localStorage.getItem(storageKey);
     if (saved === "kinddo" || saved === "ocean") {
       setThemeState(saved);
       document.documentElement.dataset.theme = saved;
+      return;
     }
+    document.documentElement.dataset.theme = "ocean";
   }, []);
 
   function setTheme(nextTheme: AppTheme) {

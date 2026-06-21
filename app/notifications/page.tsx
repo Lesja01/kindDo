@@ -1,4 +1,5 @@
 import { ScreenHeader } from "@/components/layout/screen-header";
+import { MarkNotificationsRead } from "@/components/notifications/mark-notifications-read";
 import { NotificationsTitle } from "@/components/notifications/notifications-copy";
 import { NotificationsList, type NotificationItem } from "@/components/notifications/notifications-list";
 import { requireUser } from "@/lib/auth";
@@ -83,12 +84,34 @@ export default async function NotificationsPage() {
     href: `/stories/${story.id}`
   }));
 
-  const notifications = [...messageNotifications.filter(isNotification), ...storyNotifications].sort(
+  const { data: dreamShares } = await supabase
+    .from("dream_shares")
+    .select("id,created_at,message,sender:users!dream_shares_sender_id_fkey(name),dream:dreams(id,title)")
+    .eq("recipient_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+  const shareNotifications: NotificationItem[] = (dreamShares ?? []).map((share) => {
+    const sender = one(share.sender);
+    const dream = one(share.dream);
+    return {
+      id: share.id,
+      kind: "dream",
+      actorName: sender?.name ?? null,
+      dreamTitle: dream?.title ?? null,
+      text: share.message,
+      createdAt: share.created_at,
+      href: `/dreams/${dream?.id ?? ""}`
+    };
+  });
+
+  const notifications = [...messageNotifications.filter(isNotification), ...storyNotifications, ...shareNotifications].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
   return (
     <section className="min-h-dvh">
+      <MarkNotificationsRead />
       <ScreenHeader title={<NotificationsTitle />} />
       <NotificationsList items={notifications} />
     </section>

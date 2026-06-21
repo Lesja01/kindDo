@@ -4,7 +4,6 @@ import Link from "next/link";
 import { ArrowLeft, ExternalLink, Instagram, MapPin, Music2, Send } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { ProfileAboutLabel, StatLabel } from "@/components/profile/profile-copy";
 import { ProfilePhotoLightbox } from "@/components/profile/profile-photo-lightbox";
 import { ReportButton } from "@/components/reports/report-button";
@@ -57,9 +56,9 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           </div>
 
           <div className="grid grid-cols-3 gap-2 rounded-2xl bg-background p-2">
-            <Stat label={<StatLabel type="dreams" />} value={dreamsCreated ?? 0} />
-            <Stat label={<StatLabel type="helped" />} value={dreamsHelped ?? 0} />
-            <Stat label={<StatLabel type="stories" />} value={gratitudeStories ?? 0} />
+            <Stat href={`/profile/${id}/activity?type=dreams`} label={<StatLabel type="dreams" />} value={dreamsCreated ?? 0} />
+            <Stat href={`/profile/${id}/activity?type=helped`} label={<StatLabel type="helped" />} value={dreamsHelped ?? 0} />
+            <Stat href={`/profile/${id}/activity?type=stories`} label={<StatLabel type="stories" />} value={gratitudeStories ?? 0} />
           </div>
         </div>
       </div>
@@ -109,11 +108,11 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   );
 }
 
-function Stat({ label, value }: { label: React.ReactNode; value: number }) {
+function Stat({ label, value, href }: { label: React.ReactNode; value: number; href: string }) {
   return (
-    <Card className="border-0 bg-white p-3 text-center shadow-none">
+    <Link href={href} className="rounded-lg border-0 bg-white p-3 text-center shadow-none transition-transform active:scale-[0.98]">
       <p className="text-xl font-extrabold">{value}</p>
       <p className="text-[11px] font-medium text-muted-foreground">{label}</p>
-    </Card>
+    </Link>
   );
 }

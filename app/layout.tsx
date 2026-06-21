@@ -24,7 +24,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body>
         <Providers>
-          <main className="mx-auto min-h-dvh w-full max-w-[480px] bg-background pb-24 shadow-[0_0_45px_rgba(31,41,55,0.08)] ring-1 ring-black/[0.03]">{children}</main>
+          <main className="mx-auto min-h-dvh w-full max-w-[480px] bg-background pb-24 shadow-[0_0_60px_rgba(31,41,55,0.12)] ring-1 ring-white/70">{children}</main>
           <BottomNav />
         </Providers>
       </body>

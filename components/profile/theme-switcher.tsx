@@ -18,12 +18,12 @@ export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <section className="rounded-3xl bg-white p-4 shadow-sm shadow-black/5">
-      <div className="mb-3">
-        <h2 className="text-lg font-extrabold tracking-normal">{t.profile.themeTitle}</h2>
-        <p className="mt-1 text-sm leading-5 text-muted-foreground">{t.profile.themeIntro}</p>
+    <section className="rounded-3xl bg-white p-3 shadow-sm shadow-black/5">
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <h2 className="text-sm font-extrabold tracking-normal">{t.profile.themeTitle}</h2>
+        <p className="text-xs text-muted-foreground">{t.profile.themeIntro}</p>
       </div>
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-1 rounded-2xl bg-background p-1">
         {themes.map((item) => {
           const active = theme === item.id;
 
@@ -32,22 +32,22 @@ export function ThemeSwitcher() {
               key={item.id}
               type="button"
               className={cn(
-                "rounded-3xl border bg-background p-3 text-left transition-transform active:scale-[0.98]",
-                active ? "border-primary shadow-lg shadow-primary/10" : "border-transparent"
+                "rounded-xl border px-2 py-2 text-left transition-transform active:scale-[0.98]",
+                active ? "border-primary bg-white shadow-sm shadow-primary/10" : "border-transparent text-muted-foreground"
               )}
               onClick={() => setTheme(item.id)}
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-sm font-extrabold">{t.profile.themes[item.id]}</span>
+                <span className="text-xs font-extrabold">{t.profile.themes[item.id]}</span>
                 {active ? (
-                  <span className="grid h-6 w-6 place-items-center rounded-full bg-primary text-primary-foreground">
-                    <Check className="h-3.5 w-3.5" />
+                  <span className="grid h-5 w-5 place-items-center rounded-full bg-primary text-primary-foreground">
+                    <Check className="h-3 w-3" />
                   </span>
                 ) : null}
               </div>
-              <div className="mt-3 flex gap-1.5">
+              <div className="mt-2 flex gap-1">
                 {item.swatches.map((color) => (
-                  <span key={color} className="h-7 flex-1 rounded-full" style={{ backgroundColor: color }} />
+                  <span key={color} className="h-3 flex-1 rounded-full" style={{ backgroundColor: color }} />
                 ))}
               </div>
             </button>

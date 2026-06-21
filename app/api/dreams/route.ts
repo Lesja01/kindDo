@@ -3,6 +3,13 @@ import { createClient } from "@/lib/supabase/server";
 
 const locationAliases: Record<string, string[]> = {
   "Беларусь": ["Беларус", "Минск", "Брест", "Витебск", "Гомель", "Гродно", "Могилев", "Могилёв"],
+  "Польша": ["Польш", "Poland", "Warsaw", "Варшава", "Краков", "Krakow", "Гданьск"],
+  "Литва": ["Литв", "Lithuania", "Вильнюс", "Vilnius", "Каунас"],
+  "Латвия": ["Латви", "Latvia", "Рига", "Riga"],
+  "Грузия": ["Грузи", "Georgia", "Тбилиси", "Tbilisi", "Батуми"],
+  "Казахстан": ["Казахстан", "Kazakhstan", "Алматы", "Астана", "Astana"],
+  "Армения": ["Армени", "Armenia", "Ереван", "Yerevan"],
+  "Турция": ["Турци", "Turkey", "Стамбул", "Istanbul", "Анталья"],
   "Минская область": ["Минская область", "Минск", "Борисов", "Солигорск", "Молодечно", "Жодино"],
   "Брестская область": ["Брестская область", "Брест", "Барановичи", "Пинск", "Кобрин"],
   "Витебская область": ["Витебская область", "Витебск", "Орша", "Полоцк", "Новополоцк"],
@@ -62,7 +69,7 @@ export async function GET(request: NextRequest) {
 
   let dreamsQuery = supabase
     .from("dreams")
-    .select("*, author:users!dreams_author_id_fkey(*), media:dream_media(*)")
+    .select("*, author:users!dreams_author_id_fkey(*), media:dream_media(*), responders:chats(id,candidate:users!chats_user_2_fkey(id,name,avatar))")
     .in("status", ["OPEN", "TAKEN"])
     .eq("visibility", "public")
     .order("created_at", { ascending: false });

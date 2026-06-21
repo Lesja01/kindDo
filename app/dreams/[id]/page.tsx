@@ -62,6 +62,16 @@ export default async function DreamDetailPage({ params }: { params: Promise<{ id
       return helper ? { taskId: task.id, taskText: task.text, helper: helper as Profile, chatId: helperChat?.id ?? null } : null;
     })
     .filter((item): item is { taskId: string; taskText: string; helper: Profile; chatId: string | null } => Boolean(item));
+  const mentionOptions = Array.from(
+    new Map(
+      [
+        dream.helper ? { user_id: dream.helper.id, name: dream.helper.name } : null,
+        ...taskHelpers.map((item) => ({ user_id: item.helper.id, name: item.helper.name }))
+      ]
+        .filter((item): item is { user_id: string; name: string } => Boolean(item))
+        .map((item) => [item.user_id, item])
+    ).values()
+  );
 
   return (
     <article className="min-h-dvh px-4 py-4">
@@ -190,7 +200,7 @@ export default async function DreamDetailPage({ params }: { params: Promise<{ id
             </Button>
           ) : null}
         </div>
-        {isAuthor && dream.status === "TAKEN" ? <CreateStoryForm dreamId={dream.id} dreamTitle={dream.title} helperName={dream.helper?.name ?? null} /> : null}
+        {isAuthor && dream.status === "TAKEN" ? <CreateStoryForm dreamId={dream.id} dreamTitle={dream.title} helperName={dream.helper?.name ?? null} mentionOptions={mentionOptions} /> : null}
       </div>
     </article>
   );

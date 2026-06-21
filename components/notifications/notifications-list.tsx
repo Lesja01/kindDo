@@ -8,7 +8,7 @@ import { cn, timeAgo } from "@/lib/utils";
 
 export type NotificationItem = {
   id: string;
-  kind: "message" | "story" | "help";
+  kind: "message" | "story" | "help" | "dream";
   actorName: string | null;
   dreamTitle: string | null;
   text: string | null;
@@ -19,13 +19,15 @@ export type NotificationItem = {
 const iconByKind = {
   message: MessageCircle,
   story: Sparkles,
-  help: HeartHandshake
+  help: HeartHandshake,
+  dream: HeartHandshake
 };
 
 const toneByKind = {
   message: "bg-secondary/15 text-secondary",
   story: "bg-primary/15 text-primary",
-  help: "bg-success/15 text-success"
+  help: "bg-success/15 text-success",
+  dream: "bg-primary/15 text-primary"
 };
 
 export function NotificationsList({ items }: { items: NotificationItem[] }) {
@@ -44,10 +46,14 @@ export function NotificationsList({ items }: { items: NotificationItem[] }) {
             ? `${t.common.newMessageFrom} ${item.actorName ?? t.common.dreamer}`
             : item.kind === "story"
               ? t.common.storyReady
+              : item.kind === "dream"
+                ? `${item.actorName ?? t.common.dreamer} ${t.dreams.sharedDream}`
               : t.common.helped;
         const subtitle =
           item.kind === "message"
             ? (item.text ?? item.dreamTitle ?? t.common.message)
+            : item.kind === "dream"
+              ? (item.text ?? item.dreamTitle ?? t.common.dreams)
             : `${t.common.storyReadyFrom} ${item.actorName ?? t.common.dreamer}${item.dreamTitle ? `: ${item.dreamTitle}` : ""}`;
 
         return (

@@ -107,7 +107,7 @@ export function MultiMediaUpload({
             <input className="sr-only" type="file" multiple accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,video/quicktime" onChange={handleFiles} disabled={uploading} />
           </label>
         )}
-        {values.length < MAX_MEDIA_FILES ? (
+        {values.length > 0 && values.length < MAX_MEDIA_FILES ? (
           <label className="mt-2 flex h-11 cursor-pointer items-center justify-center gap-2 rounded-2xl border text-sm font-semibold text-foreground">
             <Upload className="h-4 w-4" />
             {uploading ? t.common.uploading : t.common.uploadVideo}

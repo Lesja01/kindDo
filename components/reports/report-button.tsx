@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { Flag, Loader2, MoreHorizontal, X } from "lucide-react";
+import { Flag, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useI18n } from "@/lib/i18n";
@@ -11,7 +11,17 @@ type ReportTarget = "dream" | "story" | "profile";
 
 const reasons = ["unsafe", "spam", "fraud", "harassment", "other"] as const;
 
-export function ReportButton({ targetType, targetId, light = false }: { targetType: ReportTarget; targetId: string; light?: boolean }) {
+export function ReportButton({
+  targetType,
+  targetId,
+  light = false,
+  compact = false
+}: {
+  targetType: ReportTarget;
+  targetId: string;
+  light?: boolean;
+  compact?: boolean;
+}) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState<(typeof reasons)[number]>("unsafe");
@@ -46,13 +56,17 @@ export function ReportButton({ targetType, targetId, light = false }: { targetTy
     <>
       <Button
         type="button"
-        size="icon"
+        size={compact ? "sm" : "icon"}
         variant="ghost"
-        className={cn("rounded-full", light && "bg-black/25 text-white backdrop-blur hover:bg-black/35 hover:text-white")}
+        className={cn(
+          compact ? "h-9 w-full justify-start rounded-xl px-3 text-sm font-bold text-destructive hover:bg-destructive/10" : "rounded-full",
+          light && "bg-black/25 text-white backdrop-blur hover:bg-black/35 hover:text-white"
+        )}
         aria-label={t.reports.report}
         onClick={() => setOpen(true)}
       >
-        <MoreHorizontal className="h-5 w-5" />
+        <Flag className="h-5 w-5" />
+        {compact ? t.reports.report : null}
       </Button>
 
       {open ? (

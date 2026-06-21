@@ -28,6 +28,12 @@ export type Dream = {
   helper?: Profile | null;
   tasks?: DreamTask[];
   media?: DreamMedia[];
+  responders?: DreamResponder[];
+};
+
+export type DreamResponder = {
+  id: string;
+  candidate?: Pick<Profile, "id" | "name" | "avatar"> | Pick<Profile, "id" | "name" | "avatar">[] | null;
 };
 
 export type DreamMedia = {
@@ -92,6 +98,16 @@ export type Story = {
   dream?: Dream | null;
   author?: Profile | null;
   helper?: Profile | null;
+  mentions?: StoryMention[];
+};
+
+export type StoryMention = {
+  id: string;
+  story_id: string;
+  user_id: string | null;
+  name: string;
+  created_at: string;
+  user?: Profile | null;
 };
 
 export type SocialLink = {

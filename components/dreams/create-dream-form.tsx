@@ -13,7 +13,7 @@ import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { DreamVisibility } from "@/types/database";
 
-const categories = ["Family", "Health", "Learning", "Home", "Work", "Travel", "Creativity", "Sport", "Kids", "Community"];
+const categories = ["Family", "Health", "Learning", "Home", "Pets", "Work", "Travel", "Creativity", "Sport", "Kids", "Community"];
 
 export function CreateDreamForm() {
   const router = useRouter();
@@ -62,8 +62,7 @@ export function CreateDreamForm() {
         <div />
       </div>
 
-      <div className="space-y-2">
-        <Label className="px-1">{t.common.uploadVideo}</Label>
+      <div>
         <MultiMediaUpload bucket="dream-videos" values={mediaUrls} onChange={setMediaUrls} />
       </div>
 

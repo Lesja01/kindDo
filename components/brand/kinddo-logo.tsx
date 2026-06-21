@@ -25,38 +25,18 @@ export function KindDoLogo({
 export function KindDoMark({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 64 64" role="img" aria-label="KindDo">
-      <defs>
-        <linearGradient id="kinddo-mark-gradient" x1="12" x2="52" y1="52" y2="12" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#FF7A59" />
-          <stop offset="1" stopColor="#4ECDC4" />
-        </linearGradient>
-      </defs>
-      <rect width="64" height="64" rx="22" fill="#FFF" />
-      <path
-        d="M17 39.5c4.7-5.1 9.1-7.6 13.4-7.6h6.1c2.2 0 3.9 1.6 3.9 3.6 0 1.9-1.6 3.5-3.7 3.5h-7.5"
-        fill="none"
-        stroke="#FF7A59"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="5"
-      />
-      <path
-        d="M28.8 45.6h8.8c3.7 0 7.2-1.6 9.7-4.4l2.4-2.7c1.4-1.6 1.2-4-.4-5.3-1.5-1.2-3.7-1.1-5.1.2l-5.1 4.8"
-        fill="none"
-        stroke="#4ECDC4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="5"
-      />
-      <path
-        d="M34 23.5c4.7-3.4 8.3-7.2 10.9-11.3m0 0 .8 6.9m-.8-6.9-6.8 1.2"
-        fill="none"
-        stroke="url(#kinddo-mark-gradient)"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="4.5"
-      />
-      <circle cx="30.7" cy="24.9" r="2.7" fill="#2ECC71" />
+      <rect width="64" height="64" rx="18" fill="#050607" />
+      <path d="M46.4 7.8 49.8 15l7.8 1.1-5.6 5.5 1.3 7.7-6.9-3.7-6.9 3.7 1.3-7.7-5.6-5.5L43 15l3.4-7.2Z" fill="#FF7A59" />
+      <path d="M24.9 39.4c4.7-7.8 10.8-13.6 18.2-17.2" fill="none" stroke="#FF7A59" strokeLinecap="round" strokeWidth="3.6" />
+      <path d="M32.8 31.8c2.8-1.6 5.7-3.1 8.8-4.5" fill="none" stroke="#FFB29F" strokeLinecap="round" strokeWidth="2.2" opacity=".95" />
+      <circle cx="24.4" cy="31" r="5.4" fill="#4ECDC4" />
+      <path d="M18.4 55.5 24 38.2c.4-1.2 2-1.6 3-.8l7.2 5.5c.4.3.7.7.9 1.2l3.2 11.4H18.4Z" fill="#4ECDC4" />
+      <path d="M28.9 39.5c4.4-2.5 8-5.8 10.7-10" fill="none" stroke="#4ECDC4" strokeLinecap="round" strokeWidth="4.4" />
+      <path d="M22.3 39.8c-3.6 2.6-6.3 6.1-8.2 10.7" fill="none" stroke="#4ECDC4" strokeLinecap="round" strokeWidth="4.2" />
+      <path d="M24.2 55.5v-6.2M32.3 55.5l-1.6-6" fill="none" stroke="#B6FFF8" strokeLinecap="round" strokeWidth="2.6" opacity=".9" />
+      <circle cx="17" cy="15.5" r="1.3" fill="#FFFFFF" opacity=".85" />
+      <circle cx="22.8" cy="11.7" r=".85" fill="#FFFFFF" opacity=".6" />
+      <circle cx="53" cy="36.8" r=".95" fill="#FFFFFF" opacity=".55" />
     </svg>
   );
 }

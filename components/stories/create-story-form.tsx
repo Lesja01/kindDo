@@ -10,17 +10,42 @@ import { Textarea } from "@/components/ui/textarea";
 import { VideoUpload } from "@/components/media/video-upload";
 import { useI18n } from "@/lib/i18n";
 
-export function CreateStoryForm({ dreamId, dreamTitle, helperName }: { dreamId: string; dreamTitle: string; helperName: string | null }) {
+type MentionOption = {
+  user_id: string;
+  name: string;
+};
+
+export function CreateStoryForm({
+  dreamId,
+  dreamTitle,
+  helperName,
+  mentionOptions = []
+}: {
+  dreamId: string;
+  dreamTitle: string;
+  helperName: string | null;
+  mentionOptions?: MentionOption[];
+}) {
   const { t } = useI18n();
   const [text, setText] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
-  const [mention, setMention] = useState(helperName ?? "");
+  const [selectedMentions, setSelectedMentions] = useState<string[]>(() => mentionOptions.map((option) => option.user_id));
+  const [customMentions, setCustomMentions] = useState(helperName && !mentionOptions.length ? helperName : "");
   const [storyId, setStoryId] = useState("");
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const storyUrl = storyId && typeof window !== "undefined" ? `${window.location.origin}/stories/${storyId}` : "";
-  const shareText = [text || t.stories.dreamCameTrue, mention ? `${t.stories.thanksTo} ${mention}` : "", dreamTitle, storyUrl]
+  const mentions = [
+    ...mentionOptions.filter((option) => selectedMentions.includes(option.user_id)),
+    ...customMentions
+      .split(",")
+      .map((name) => name.trim())
+      .filter(Boolean)
+      .map((name) => ({ user_id: null, name }))
+  ];
+  const mentionText = mentions.map((mention) => mention.name).join(", ");
+  const shareText = [text || t.stories.dreamCameTrue, mentionText ? `${t.stories.thanksTo} ${mentionText}` : "", dreamTitle, storyUrl]
     .filter(Boolean)
     .join("\n");
 
@@ -36,7 +61,7 @@ export function CreateStoryForm({ dreamId, dreamTitle, helperName }: { dreamId: 
     const response = await fetch(`/api/dreams/${dreamId}/complete`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ video_url: videoUrl, text })
+      body: JSON.stringify({ video_url: videoUrl, text, mentions })
     });
     const payload = await response.json();
     setLoading(false);
@@ -47,6 +72,10 @@ export function CreateStoryForm({ dreamId, dreamTitle, helperName }: { dreamId: 
     }
 
     setStoryId(payload.id);
+  }
+
+  function toggleMention(userId: string) {
+    setSelectedMentions((current) => (current.includes(userId) ? current.filter((id) => id !== userId) : [...current, userId]));
   }
 
   async function copyShareText() {
@@ -78,13 +107,30 @@ export function CreateStoryForm({ dreamId, dreamTitle, helperName }: { dreamId: 
           <p className="mt-1 text-xs leading-5 text-muted-foreground">{t.stories.shareIntro}</p>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="story-mention">{t.stories.mentionPerson}</Label>
+          <Label htmlFor="story-mention">{t.stories.mentionPeople}</Label>
+          {mentionOptions.length ? (
+            <div className="flex flex-wrap gap-2">
+              {mentionOptions.map((option) => {
+                const active = selectedMentions.includes(option.user_id);
+                return (
+                  <button
+                    key={option.user_id}
+                    type="button"
+                    className={active ? "rounded-full bg-primary px-3 py-2 text-xs font-bold text-primary-foreground" : "rounded-full bg-white px-3 py-2 text-xs font-bold text-muted-foreground ring-1 ring-border/70"}
+                    onClick={() => toggleMention(option.user_id)}
+                  >
+                    {option.name}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
           <Input
             id="story-mention"
             className="h-10 rounded-2xl border-0 bg-white ring-1 ring-border/70"
-            value={mention}
-            placeholder={helperName ?? "@username"}
-            onChange={(event) => setMention(event.target.value)}
+            value={customMentions}
+            placeholder={t.stories.mentionPlaceholder}
+            onChange={(event) => setCustomMentions(event.target.value)}
           />
         </div>
 

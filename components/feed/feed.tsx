@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { Dream, Story } from "@/types/database";
 
 const PAGE_SIZE = 5;
-const categories = ["Family", "Health", "Learning", "Home", "Work", "Travel", "Creativity", "Sport", "Kids", "Community"];
+const categories = ["Family", "Health", "Learning", "Home", "Pets", "Work", "Travel", "Creativity", "Sport", "Kids", "Community"];
 const CUSTOM_AREA = "__custom__";
 
 async function fetchPage<T>(url: string, page: number, filters?: FeedFilters): Promise<T[]> {
@@ -28,7 +28,7 @@ async function fetchPage<T>(url: string, page: number, filters?: FeedFilters): P
   if (filters?.ageTo) params.set("ageTo", filters.ageTo);
   if (filters?.favoritesOnly) params.set("favorites", "1");
 
-  const response = await fetch(`${url}?${params.toString()}`);
+  const response = await fetch(`${url}${url.includes("?") ? "&" : "?"}${params.toString()}`);
   if (!response.ok) throw new Error("Unable to load feed");
   return response.json();
 }
@@ -58,6 +58,13 @@ export function Feed({ viewerId }: { viewerId: string | null }) {
     initialPageParam: 0,
     getNextPageParam: (lastPage, pages) => (lastPage.length === PAGE_SIZE ? pages.length : undefined)
   });
+  const mentionedStories = useInfiniteQuery({
+    queryKey: ["stories", "mentioned"],
+    queryFn: ({ pageParam }) => fetchPage<Story>("/api/stories?mentioned=me", pageParam),
+    initialPageParam: 0,
+    enabled: Boolean(viewerId),
+    getNextPageParam: (lastPage, pages) => (lastPage.length === PAGE_SIZE ? pages.length : undefined)
+  });
 
   return (
     <Tabs defaultValue="dreams" className="min-h-dvh">
@@ -68,20 +75,28 @@ export function Feed({ viewerId }: { viewerId: string | null }) {
           </Link>
         }
       />
-      <div className="sticky top-[60px] z-20 bg-background/90 px-4 pt-1 backdrop-blur-xl">
-        <TabsList className="grid h-11 w-full grid-cols-2 border-b border-border/70 bg-transparent">
+      <div className="sticky top-[60px] z-20 bg-background/80 px-4 py-2 backdrop-blur-xl">
+        <TabsList className={cn("grid h-10 w-full rounded-full border border-white/80 bg-white/65 p-1 shadow-lg shadow-black/5 backdrop-blur-xl", viewerId ? "grid-cols-3" : "grid-cols-2")}>
           <TabsTrigger
             value="dreams"
-            className="relative h-11 rounded-none bg-transparent pb-3 pt-2 text-sm font-bold text-muted-foreground shadow-none transition-colors after:absolute after:bottom-0 after:left-5 after:right-5 after:h-0.5 after:rounded-full after:bg-transparent data-[state=active]:text-primary data-[state=active]:after:bg-primary"
+            className="h-8 rounded-full bg-transparent text-sm font-bold text-muted-foreground shadow-none transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/20"
           >
-            {t.common.worldDreams}
+            {t.common.dreams}
           </TabsTrigger>
           <TabsTrigger
             value="stories"
-            className="relative h-11 rounded-none bg-transparent pb-3 pt-2 text-sm font-bold text-muted-foreground shadow-none transition-colors after:absolute after:bottom-0 after:left-5 after:right-5 after:h-0.5 after:rounded-full after:bg-transparent data-[state=active]:text-primary data-[state=active]:after:bg-primary"
+            className="h-8 rounded-full bg-transparent px-2 text-sm font-bold text-muted-foreground shadow-none transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/20"
           >
-            {t.nav.stories}
+            {t.stories.fulfilledShort}
           </TabsTrigger>
+          {viewerId ? (
+            <TabsTrigger
+              value="mentioned"
+              className="h-8 rounded-full bg-transparent px-2 text-sm font-bold text-muted-foreground shadow-none transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/20"
+            >
+              {t.stories.helpedShort}
+            </TabsTrigger>
+          ) : null}
         </TabsList>
       </div>
 
@@ -95,6 +110,13 @@ export function Feed({ viewerId }: { viewerId: string | null }) {
         {stories.data?.pages.flat().map((story) => <StoryCard key={story.id} story={story} />)}
         <LoadMore isLoading={stories.isFetchingNextPage} hasNext={stories.hasNextPage} onClick={() => stories.fetchNextPage()} />
       </TabsContent>
+
+      {viewerId ? (
+        <TabsContent value="mentioned" className="m-0">
+          {mentionedStories.data?.pages.flat().map((story) => <StoryCard key={story.id} story={story} />)}
+          <LoadMore isLoading={mentionedStories.isFetchingNextPage} hasNext={mentionedStories.hasNextPage} onClick={() => mentionedStories.fetchNextPage()} />
+        </TabsContent>
+      ) : null}
     </Tabs>
   );
 }
